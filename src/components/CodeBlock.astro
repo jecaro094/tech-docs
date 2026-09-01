@@ -1,0 +1,21 @@
+---
+interface Props {
+  code: string;
+  language?: string;
+}
+
+const { code, language = '' } = Astro.props;
+
+// Escape HTML entities to prevent Astro from interpreting them
+const escapedCode = code
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+---
+
+<div class="code-block">
+  <div class="code-block-header">
+    <span>{language || 'Code'}</span>
+  </div>
+  <pre><code set:html={escapedCode}></code></pre>
+</div>

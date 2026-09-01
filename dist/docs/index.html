@@ -1,0 +1,139 @@
+<!DOCTYPE html><html lang="es" data-astro-cid-sckkx6r4> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Documentación Técnica | Tech Docs</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/_astro/index.DUKMAfXZ.css"></head> <body data-astro-cid-sckkx6r4> <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" data-astro-cid-sckkx6r4>
+☰
+</button> <div class="layout" data-astro-cid-sckkx6r4> <aside class="sidebar" id="sidebar" data-astro-cid-sckkx6r4> <div class="sidebar-header" data-astro-cid-sckkx6r4> <a href="/" style="text-decoration: none;" data-astro-cid-sckkx6r4> <div class="sidebar-title" data-astro-cid-sckkx6r4>📚 Tech Docs</div> <div class="sidebar-subtitle" data-astro-cid-sckkx6r4>Documentación personal</div> </a> </div> <nav data-astro-cid-sckkx6r4> <div class="nav-section" data-astro-cid-sckkx6r4> <div class="nav-section-title" data-astro-cid-sckkx6r4>Principal</div> <a href="/" class="nav-link" data-astro-cid-sckkx6r4>
+Inicio
+</a> </div> <div class="nav-section" data-astro-cid-sckkx6r4> <div class="nav-section-title" data-astro-cid-sckkx6r4>Categorías</div> <a href="/interviews" class="nav-link" data-astro-cid-sckkx6r4>
+🎯 Entrevistas
+</a> <a href="/docs" class="nav-link active" data-astro-cid-sckkx6r4>
+📖 Documentación
+</a> <a href="/notes" class="nav-link" data-astro-cid-sckkx6r4>
+📝 Notas
+</a> <a href="/snippets" class="nav-link" data-astro-cid-sckkx6r4>
+💻 Snippets
+</a> </div> <div class="nav-section" data-astro-cid-sckkx6r4> <div class="nav-section-title" data-astro-cid-sckkx6r4>Recursos</div> <a href="https://github.com" target="_blank" class="nav-link" data-astro-cid-sckkx6r4>
+🔗 GitHub
+</a> </div> </nav> </aside> <main class="main-content" data-astro-cid-sckkx6r4>  <h1>📖 Documentación Técnica</h1> <p>
+Documentación de APIs, frameworks y herramientas que uso frecuentemente.
+    Incluye ejemplos prácticos y snippets listos para copiar.
+</p> <h2>REST API Design</h2> <div class="callout callout-info"> <div class="callout-title">📐 Convenciones</div> <p>
+Basado en las mejores prácticas de diseño de APIs REST modernas.
+      Estas convenciones uso consistentemente en todos mis proyectos.
+</p> </div> <h3>Estructura de URLs</h3> <div class="code-block"> <div class="code-block-header"> <span>Bash</span> </div> <pre><code># ✅ Correcto - Recursos en plural, jerarquía clara
+GET    /api/v1/users
+GET    /api/v1/users/:id
+POST   /api/v1/users
+PUT    /api/v1/users/:id
+DELETE /api/v1/users/:id
+
+# Sub-recursos
+GET    /api/v1/users/:id/posts
+GET    /api/v1/users/:id/posts/:postId
+
+# ❌ Incorrecto - Evitar verbos en URLs
+GET    /api/v1/getUsers
+POST   /api/v1/createUser</code></pre> </div> <h3>Response Format</h3> <div class="code-block"> <div class="code-block-header"> <span>JSON</span> </div> <pre><code>{
+  "success": true,
+  "data": {
+    "id": "usr_123",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "createdAt": "2024-01-15T10:30:00Z"
+  },
+  "meta": {
+    "page": 1,
+    "perPage": 20,
+    "total": 150
+  }
+}</code></pre> </div> <h3>Error Response</h3> <div class="code-block"> <div class="code-block-header"> <span>JSON</span> </div> <pre><code>{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Email is required",
+    "details": [
+      {
+        "field": "email",
+        "message": "This field is required"
+      }
+    ]
+  }
+}</code></pre> </div> <hr> <h2>Autenticación JWT</h2> <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"> <span class="tag">Security</span> <span class="tag">JWT</span> <span class="tag">Auth</span> </div> <h3>Flujo de autenticación</h3> <ol> <li>Usuario envía credenciales (email + password)</li> <li>Servidor valida y genera JWT access token (corta duración) + refresh token</li> <li>Cliente almacena tokens de forma segura</li> <li>Envía access token en header Authorization</li> <li>Al expirar, usa refresh token para obtener nuevo access token</li> </ol> <div class="code-block"> <div class="code-block-header"> <span>TypeScript</span> </div> <pre><code>import jwt from 'jsonwebtoken';
+
+interface TokenPayload {
+  userId: string;
+  email: string;
+  role: 'user' | 'admin';
+}
+
+// Generar tokens
+function generateTokens(payload: TokenPayload) {
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
+    expiresIn: '15m'  // Corta duración
+  });
+  
+  const refreshToken = jwt.sign(
+    { userId: payload.userId },
+    process.env.REFRESH_SECRET!,
+    { expiresIn: '7d' }  // Larga duración
+  );
+  
+  return { accessToken, refreshToken };
+}
+
+// Verificar token
+function verifyToken(token: string): TokenPayload {
+  return jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+}
+
+// Middleware de autenticación
+function authMiddleware(req: Request) {
+  const authHeader = req.headers.get('Authorization');
+  
+  if (!authHeader?.startsWith('Bearer ')) {
+    throw new Error('No token provided');
+  }
+  
+  const token = authHeader.split(' ')[1];
+  return verifyToken(token);
+}</code></pre> </div> <div class="callout callout-warning"> <div class="callout-title">⚠️ Seguridad</div> <p> <strong>Nunca</strong> guardes JWT en localStorage para apps con datos sensibles.
+      Usa httpOnly cookies o refresh tokens con rotación.
+</p> </div> <hr> <h2>Git Commands</h2> <p>Comandos de Git que uso frecuentemente organizados por categoría:</p> <h3>Staging y Commits</h3> <div class="code-block"> <div class="code-block-header"> <span>Bash</span> </div> <pre><code># Stage específico
+git add src/components/Button.tsx
+
+# Stage todo excepto archivos sensibles
+git add .
+git reset HEAD .env
+
+# Commit con mensaje descriptivo
+git commit -m "feat(auth): add JWT refresh token rotation
+
+- Implement refresh token generation
+- Add token verification middleware
+- Update auth flow to handle expired tokens
+
+Closes #123"
+
+# Amend último commit (solo si no se ha pusheado)
+git commit --amend --no-edit</code></pre> </div> <h3>Branches</h3> <div class="code-block"> <div class="code-block-header"> <span>Bash</span> </div> <pre><code># Crear y cambiar a branch
+git checkout -b feature/user-profile
+
+# Ver todos los branches
+git branch -a
+
+# Merge de main a feature
+git checkout feature/user-profile
+git merge main
+
+# Rebase para mantener historial limpio
+git rebase main</code></pre> </div> <h3>Resolución de conflictos</h3> <div class="code-block"> <div class="code-block-header"> <span>Bash</span> </div> <pre><code># Ver conflictos
+git status
+
+# Resolver conflictos manualmente en los archivos
+# Luego:
+git add .
+git commit -m "resolve: merge conflicts in auth middleware"
+
+# O abortar merge
+git merge --abort</code></pre> </div> <div class="callout callout-success"> <div class="callout-title">✅ Tip</div> <p>
+Usa <code>git log --oneline --graph --all</code> para ver el historial de branches
+      de forma visual. Es útil para entender la estructura del repo.
+</p> </div>  </main> </div>  <script type="module">const n=document.getElementById("menuToggle"),e=document.getElementById("sidebar");n?.addEventListener("click",()=>{e?.classList.toggle("open")});document.addEventListener("click",t=>{window.innerWidth<=768&&e?.classList.contains("open")&&!e.contains(t.target)&&t.target!==n&&e.classList.remove("open")});</script> </body> </html>

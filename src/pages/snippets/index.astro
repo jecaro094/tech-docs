@@ -1,0 +1,315 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const binarySearchPython = `def binary_search(arr: list[int], target: int) -> int:
+    """Busca target en arr ordenado. Retorna índice o -1."""
+    left, right = 0, len(arr) - 1
+    
+    while left <= right:
+        mid = (left + right) // 2
+        
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return -1
+
+# Uso
+nums = [1, 3, 5, 7, 9, 11]
+print(binary_search(nums, 7))  # Output: 3`;
+
+const binarySearchTypeScript = `function binarySearch(arr: number[], target: number): number {
+  let left = 0;
+  let right = arr.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    
+    if (arr[mid] === target) {
+      return mid;
+    } else if (arr[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  
+  return -1;
+}
+
+// Uso
+const nums = [1, 3, 5, 7, 9, 11];
+console.log(binarySearch(nums, 7));  // Output: 3`;
+
+const binarySearchGo = `func binarySearch(arr []int, target int) int {
+    left, right := 0, len(arr)-1
+    
+    for left <= right {
+        mid := (left + right) / 2
+        
+        if arr[mid] == target {
+            return mid
+        } else if arr[mid] < target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    
+    return -1
+}
+
+// Uso
+nums := []int{1, 3, 5, 7, 9, 11}
+fmt.Println(binarySearch(nums, 7))  // Output: 3`;
+
+const lruCacheCode = `class LRUCache<K, V> {
+  private capacity: number;
+  private cache: Map<K, V>;
+
+  constructor(capacity: number) {
+    this.capacity = capacity;
+    this.cache = new Map();
+  }
+
+  get(key: K): V | undefined {
+    if (!this.cache.has(key)) {
+      return undefined;
+    }
+    
+    // Mover al final (más reciente)
+    const value = this.cache.get(key)!;
+    this.cache.delete(key);
+    this.cache.set(key, value);
+    
+    return value;
+  }
+
+  put(key: K, value: V): void {
+    // Eliminar si existe
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
+    
+    // Eliminar el más antiguo si está lleno
+    if (this.cache.size >= this.capacity) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+    
+    this.cache.set(key, value);
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+}
+
+// Uso
+const cache = new LRUCache<string, number>(3);
+cache.put('a', 1);
+cache.put('b', 2);
+cache.put('c', 3);
+cache.get('a');  // 1 - 'a' ahora es el más reciente
+cache.put('d', 4);  // 'b' se elimina (más antiguo)`;
+
+const retryCode = `interface RetryOptions {
+  maxRetries: number;
+  initialDelay: number;
+  maxDelay: number;
+  backoffMultiplier: number;
+}
+
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  options: Partial<RetryOptions> = {}
+): Promise<T> {
+  const {
+    maxRetries = 3,
+    initialDelay = 1000,
+    maxDelay = 30000,
+    backoffMultiplier = 2
+  } = options;
+
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      
+      if (attempt === maxRetries) {
+        break;
+      }
+      
+      const delay = Math.min(
+        initialDelay * Math.pow(backoffMultiplier, attempt),
+        maxDelay
+      );
+      
+      console.log('Attempt ' + (attempt + 1) + ' failed. Retrying in ' + delay + 'ms...');
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError!;
+}
+
+// Uso
+const data = await retryWithBackoff(
+  () => fetch('https://api.example.com/data'),
+  { maxRetries: 3, initialDelay: 1000 }
+);`;
+
+const useDebounceCode = `import { useState, useEffect } from 'react';
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Uso en componente
+function SearchInput() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+
+  useEffect(() => {
+    if (debouncedQuery) {
+      // Hacer búsqueda API
+      search(debouncedQuery);
+    }
+  }, [debouncedQuery]);
+
+  return (
+    <input
+      type="text"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder="Buscar..."
+    />
+  );
+}`;
+---
+
+<Layout title="Snippets de Código" activePage="snippets">
+  <h1>💻 Snippets de Código</h1>
+  <p>
+    Trozos de código reutilizables en múltiples lenguajes.
+    Código probado, documentado y listo para copiar.
+  </p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">📋 Organización</div>
+    <p>
+      Cada snippet incluye: descripción, código, y casos de uso comunes.
+      Usa la navegación por categorías para encontrar lo que necesitas.
+    </p>
+  </div>
+
+  <h2>Algoritmos</h2>
+
+  <h3>Binary Search</h3>
+
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+    <span class="tag">Algoritmo</span>
+    <span class="tag">Búsqueda</span>
+    <span class="tag">O(log n)</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-buttons">
+      <button class="tab-button active" data-tab="python">Python</button>
+      <button class="tab-button" data-tab="typescript">TypeScript</button>
+      <button class="tab-button" data-tab="go">Go</button>
+    </div>
+    
+    <div class="tab-content active" id="python">
+      <CodeBlock language="Python" code={binarySearchPython} />
+    </div>
+    
+    <div class="tab-content" id="typescript">
+      <CodeBlock language="TypeScript" code={binarySearchTypeScript} />
+    </div>
+    
+    <div class="tab-content" id="go">
+      <CodeBlock language="Go" code={binarySearchGo} />
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>Data Structures</h2>
+
+  <h3>LRU Cache</h3>
+
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+    <span class="tag">Cache</span>
+    <span class="tag">Hash Map</span>
+    <span class="tag">Linked List</span>
+  </div>
+
+  <CodeBlock language="TypeScript" code={lruCacheCode} />
+
+  <hr />
+
+  <h2>API Patterns</h2>
+
+  <h3>Retry with Backoff</h3>
+
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+    <span class="tag">Resiliencia</span>
+    <span class="tag">API</span>
+    <span class="tag">Error Handling</span>
+  </div>
+
+  <CodeBlock language="TypeScript" code={retryCode} />
+
+  <div class="callout callout-success">
+    <div class="callout-title">✅ Cuándo usar</div>
+    <p>
+      <strong>Úsalo para:</strong> Llamadas a APIs externas, operaciones de red, servicios con disponibilidad limitada.<br />
+      <strong>No lo uses para:</strong> Errores de validación, errores de autenticación, o errores que no son temporales.
+    </p>
+  </div>
+
+  <hr />
+
+  <h2>React Patterns</h2>
+
+  <h3>Custom Hook: useDebounce</h3>
+
+  <CodeBlock language="React + TypeScript" code={useDebounceCode} />
+
+  <script>
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => {
+        const tabId = button.getAttribute('data-tab');
+        const container = button.closest('.tabs');
+        
+        // Desactivar todos
+        container?.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        container?.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Activar seleccionado
+        button.classList.add('active');
+        container?.querySelector(`#${tabId}`)?.classList.add('active');
+      });
+    });
+  </script>
+</Layout>

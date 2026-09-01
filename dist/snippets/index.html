@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="es" data-astro-cid-sckkx6r4> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Snippets de Código | Tech Docs</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/_astro/index.DUKMAfXZ.css"></head> <body data-astro-cid-sckkx6r4> <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" data-astro-cid-sckkx6r4>
+☰
+</button> <div class="layout" data-astro-cid-sckkx6r4> <aside class="sidebar" id="sidebar" data-astro-cid-sckkx6r4> <div class="sidebar-header" data-astro-cid-sckkx6r4> <a href="/" style="text-decoration: none;" data-astro-cid-sckkx6r4> <div class="sidebar-title" data-astro-cid-sckkx6r4>📚 Tech Docs</div> <div class="sidebar-subtitle" data-astro-cid-sckkx6r4>Documentación personal</div> </a> </div> <nav data-astro-cid-sckkx6r4> <div class="nav-section" data-astro-cid-sckkx6r4> <div class="nav-section-title" data-astro-cid-sckkx6r4>Principal</div> <a href="/" class="nav-link" data-astro-cid-sckkx6r4>
+Inicio
+</a> </div> <div class="nav-section" data-astro-cid-sckkx6r4> <div class="nav-section-title" data-astro-cid-sckkx6r4>Categorías</div> <a href="/interviews" class="nav-link" data-astro-cid-sckkx6r4>
+🎯 Entrevistas
+</a> <a href="/docs" class="nav-link" data-astro-cid-sckkx6r4>
+📖 Documentación
+</a> <a href="/notes" class="nav-link" data-astro-cid-sckkx6r4>
+📝 Notas
+</a> <a href="/snippets" class="nav-link active" data-astro-cid-sckkx6r4>
+💻 Snippets
+</a> </div> <div class="nav-section" data-astro-cid-sckkx6r4> <div class="nav-section-title" data-astro-cid-sckkx6r4>Recursos</div> <a href="https://github.com" target="_blank" class="nav-link" data-astro-cid-sckkx6r4>
+🔗 GitHub
+</a> </div> </nav> </aside> <main class="main-content" data-astro-cid-sckkx6r4>  <h1>💻 Snippets de Código</h1> <p>
+Trozos de código reutilizables en múltiples lenguajes.
+    Código probado, documentado y listo para copiar.
+</p> <div class="callout callout-info"> <div class="callout-title">📋 Organización</div> <p>
+Cada snippet incluye: descripción, código, y casos de uso comunes.
+      Usa la navegación por categorías para encontrar lo que necesitas.
+</p> </div> <h2>Algoritmos</h2> <h3>Binary Search</h3> <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"> <span class="tag">Algoritmo</span> <span class="tag">Búsqueda</span> <span class="tag">O(log n)</span> </div> <div class="tabs"> <div class="tab-buttons"> <button class="tab-button active" data-tab="python">Python</button> <button class="tab-button" data-tab="typescript">TypeScript</button> <button class="tab-button" data-tab="go">Go</button> </div> <div class="tab-content active" id="python"> <div class="code-block"> <div class="code-block-header"> <span>Python</span> </div> <pre><code>def binary_search(arr: list[int], target: int) -&gt; int:
+    """Busca target en arr ordenado. Retorna índice o -1."""
+    left, right = 0, len(arr) - 1
+    
+    while left &lt;= right:
+        mid = (left + right) // 2
+        
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] &lt; target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return -1
+
+# Uso
+nums = [1, 3, 5, 7, 9, 11]
+print(binary_search(nums, 7))  # Output: 3</code></pre> </div> </div> <div class="tab-content" id="typescript"> <div class="code-block"> <div class="code-block-header"> <span>TypeScript</span> </div> <pre><code>function binarySearch(arr: number[], target: number): number {
+  let left = 0;
+  let right = arr.length - 1;
+  
+  while (left &lt;= right) {
+    const mid = Math.floor((left + right) / 2);
+    
+    if (arr[mid] === target) {
+      return mid;
+    } else if (arr[mid] &lt; target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  
+  return -1;
+}
+
+// Uso
+const nums = [1, 3, 5, 7, 9, 11];
+console.log(binarySearch(nums, 7));  // Output: 3</code></pre> </div> </div> <div class="tab-content" id="go"> <div class="code-block"> <div class="code-block-header"> <span>Go</span> </div> <pre><code>func binarySearch(arr []int, target int) int {
+    left, right := 0, len(arr)-1
+    
+    for left &lt;= right {
+        mid := (left + right) / 2
+        
+        if arr[mid] == target {
+            return mid
+        } else if arr[mid] &lt; target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    
+    return -1
+}
+
+// Uso
+nums := []int{1, 3, 5, 7, 9, 11}
+fmt.Println(binarySearch(nums, 7))  // Output: 3</code></pre> </div> </div> </div> <hr> <h2>Data Structures</h2> <h3>LRU Cache</h3> <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"> <span class="tag">Cache</span> <span class="tag">Hash Map</span> <span class="tag">Linked List</span> </div> <div class="code-block"> <div class="code-block-header"> <span>TypeScript</span> </div> <pre><code>class LRUCache&lt;K, V&gt; {
+  private capacity: number;
+  private cache: Map&lt;K, V&gt;;
+
+  constructor(capacity: number) {
+    this.capacity = capacity;
+    this.cache = new Map();
+  }
+
+  get(key: K): V | undefined {
+    if (!this.cache.has(key)) {
+      return undefined;
+    }
+    
+    // Mover al final (más reciente)
+    const value = this.cache.get(key)!;
+    this.cache.delete(key);
+    this.cache.set(key, value);
+    
+    return value;
+  }
+
+  put(key: K, value: V): void {
+    // Eliminar si existe
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
+    
+    // Eliminar el más antiguo si está lleno
+    if (this.cache.size &gt;= this.capacity) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+    
+    this.cache.set(key, value);
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+}
+
+// Uso
+const cache = new LRUCache&lt;string, number&gt;(3);
+cache.put('a', 1);
+cache.put('b', 2);
+cache.put('c', 3);
+cache.get('a');  // 1 - 'a' ahora es el más reciente
+cache.put('d', 4);  // 'b' se elimina (más antiguo)</code></pre> </div> <hr> <h2>API Patterns</h2> <h3>Retry with Backoff</h3> <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"> <span class="tag">Resiliencia</span> <span class="tag">API</span> <span class="tag">Error Handling</span> </div> <div class="code-block"> <div class="code-block-header"> <span>TypeScript</span> </div> <pre><code>interface RetryOptions {
+  maxRetries: number;
+  initialDelay: number;
+  maxDelay: number;
+  backoffMultiplier: number;
+}
+
+async function retryWithBackoff&lt;T&gt;(
+  fn: () =&gt; Promise&lt;T&gt;,
+  options: Partial&lt;RetryOptions&gt; = {}
+): Promise&lt;T&gt; {
+  const {
+    maxRetries = 3,
+    initialDelay = 1000,
+    maxDelay = 30000,
+    backoffMultiplier = 2
+  } = options;
+
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt &lt;= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      
+      if (attempt === maxRetries) {
+        break;
+      }
+      
+      const delay = Math.min(
+        initialDelay * Math.pow(backoffMultiplier, attempt),
+        maxDelay
+      );
+      
+      console.log('Attempt ' + (attempt + 1) + ' failed. Retrying in ' + delay + 'ms...');
+      await new Promise(resolve =&gt; setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError!;
+}
+
+// Uso
+const data = await retryWithBackoff(
+  () =&gt; fetch('https://api.example.com/data'),
+  { maxRetries: 3, initialDelay: 1000 }
+);</code></pre> </div> <div class="callout callout-success"> <div class="callout-title">✅ Cuándo usar</div> <p> <strong>Úsalo para:</strong> Llamadas a APIs externas, operaciones de red, servicios con disponibilidad limitada.<br> <strong>No lo uses para:</strong> Errores de validación, errores de autenticación, o errores que no son temporales.
+</p> </div> <hr> <h2>React Patterns</h2> <h3>Custom Hook: useDebounce</h3> <div class="code-block"> <div class="code-block-header"> <span>React + TypeScript</span> </div> <pre><code>import { useState, useEffect } from 'react';
+
+function useDebounce&lt;T&gt;(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() =&gt; {
+    const timer = setTimeout(() =&gt; {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () =&gt; {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Uso en componente
+function SearchInput() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+
+  useEffect(() =&gt; {
+    if (debouncedQuery) {
+      // Hacer búsqueda API
+      search(debouncedQuery);
+    }
+  }, [debouncedQuery]);
+
+  return (
+    &lt;input
+      type="text"
+      value={query}
+      onChange={(e) =&gt; setQuery(e.target.value)}
+      placeholder="Buscar..."
+    /&gt;
+  );
+}</code></pre> </div> <script type="module">document.querySelectorAll(".tab-button").forEach(t=>{t.addEventListener("click",()=>{const c=t.getAttribute("data-tab"),e=t.closest(".tabs");e?.querySelectorAll(".tab-button").forEach(a=>a.classList.remove("active")),e?.querySelectorAll(".tab-content").forEach(a=>a.classList.remove("active")),t.classList.add("active"),e?.querySelector(`#${c}`)?.classList.add("active")})});</script>  </main> </div>  <script type="module">const n=document.getElementById("menuToggle"),e=document.getElementById("sidebar");n?.addEventListener("click",()=>{e?.classList.toggle("open")});document.addEventListener("click",t=>{window.innerWidth<=768&&e?.classList.contains("open")&&!e.contains(t.target)&&t.target!==n&&e.classList.remove("open")});</script> </body> </html>

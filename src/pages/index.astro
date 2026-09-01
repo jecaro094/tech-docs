@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Inicio" activePage="home">
+  <h1>📚 Tech Docs</h1>
+  <p>
+    Documentación personal para entrevistas técnicas, notas de desarrollo y snippets de código.
+    Un recurso rápido y organizado para consultar cuando lo necesites.
+  </p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">💡 Sobre este sitio</div>
+    <p>
+      Este sitio está construido con <strong>Astro 5</strong> y sirve como un conocimiento técnico personal organizado por categorías.
+      Cada sección contiene ejemplos prácticos listos para usar.
+    </p>
+  </div>
+
+  <h2>Secciones</h2>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+    <a href="/interviews" style="text-decoration: none;">
+      <div style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); transition: all 0.2s;">
+        <h3 style="margin-top: 0;">🎯 Entrevistas</h3>
+        <p style="color: var(--color-text-secondary); margin-bottom: 0;">
+          Preguntas comunes de entrevistas técnicas, system design, y coding challenges.
+        </p>
+      </div>
+    </a>
+    
+    <a href="/docs" style="text-decoration: none;">
+      <div style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); transition: all 0.2s;">
+        <h3 style="margin-top: 0;">📖 Documentación</h3>
+        <p style="color: var(--color-text-secondary); margin-bottom: 0;">
+          Documentación técnica de APIs, frameworks y herramientas que uso frecuentemente.
+        </p>
+      </div>
+    </a>
+    
+    <a href="/notes" style="text-decoration: none;">
+      <div style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); transition: all 0.2s;">
+        <h3 style="margin-top: 0;">📝 Notas</h3>
+        <p style="color: var(--color-text-secondary); margin-bottom: 0;">
+          Notas personales sobre patrones de diseño, arquitectura y buenas prácticas.
+        </p>
+      </div>
+    </a>
+    
+    <a href="/snippets" style="text-decoration: none;">
+      <div style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); transition: all 0.2s;">
+        <h3 style="margin-top: 0;">💻 Snippets</h3>
+        <p style="color: var(--color-text-secondary); margin-bottom: 0;">
+          Trozos de código reutilizables en múltiples lenguajes.
+        </p>
+      </div>
+    </a>
+  </div>
+
+  <h2>Uso rápido</h2>
+
+  <p>Cada sección sigue la misma estructura:</p>
+
+  <ul>
+    <li><strong>Índice</strong> — Lista de artículos disponibles</li>
+    <li><strong>Artículo</strong> — Contenido con ejemplos de código</li>
+    <li><strong>Snippets</strong> — Código copiable y listo para usar</li>
+  </ul>
+
+  <div class="callout callout-success">
+    <div class="callout-title">✅ Consejo</div>
+    <p>
+      Usa la barra lateral para navegar rápidamente entre categorías.
+      Cada página muestra el contenido más relevante primero.
+    </p>
+  </div>
+</Layout>

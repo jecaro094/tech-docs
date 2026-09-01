@@ -1,0 +1,203 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+---
+
+<Layout title="Documentación Técnica" activePage="docs">
+  <h1>📖 Documentación Técnica</h1>
+  <p>
+    Documentación de APIs, frameworks y herramientas que uso frecuentemente.
+    Incluye ejemplos prácticos y snippets listos para copiar.
+  </p>
+
+  <h2>REST API Design</h2>
+
+  <div class="callout callout-info">
+    <div class="callout-title">📐 Convenciones</div>
+    <p>
+      Basado en las mejores prácticas de diseño de APIs REST modernas.
+      Estas convenciones uso consistentemente en todos mis proyectos.
+    </p>
+  </div>
+
+  <h3>Estructura de URLs</h3>
+
+  <CodeBlock language="Bash" code={`# ✅ Correcto - Recursos en plural, jerarquía clara
+GET    /api/v1/users
+GET    /api/v1/users/:id
+POST   /api/v1/users
+PUT    /api/v1/users/:id
+DELETE /api/v1/users/:id
+
+# Sub-recursos
+GET    /api/v1/users/:id/posts
+GET    /api/v1/users/:id/posts/:postId
+
+# ❌ Incorrecto - Evitar verbos en URLs
+GET    /api/v1/getUsers
+POST   /api/v1/createUser`} />
+
+  <h3>Response Format</h3>
+
+  <CodeBlock language="JSON" code={`{
+  "success": true,
+  "data": {
+    "id": "usr_123",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "createdAt": "2024-01-15T10:30:00Z"
+  },
+  "meta": {
+    "page": 1,
+    "perPage": 20,
+    "total": 150
+  }
+}`} />
+
+  <h3>Error Response</h3>
+
+  <CodeBlock language="JSON" code={`{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Email is required",
+    "details": [
+      {
+        "field": "email",
+        "message": "This field is required"
+      }
+    ]
+  }
+}`} />
+
+  <hr />
+
+  <h2>Autenticación JWT</h2>
+
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+    <span class="tag">Security</span>
+    <span class="tag">JWT</span>
+    <span class="tag">Auth</span>
+  </div>
+
+  <h3>Flujo de autenticación</h3>
+
+  <ol>
+    <li>Usuario envía credenciales (email + password)</li>
+    <li>Servidor valida y genera JWT access token (corta duración) + refresh token</li>
+    <li>Cliente almacena tokens de forma segura</li>
+    <li>Envía access token en header Authorization</li>
+    <li>Al expirar, usa refresh token para obtener nuevo access token</li>
+  </ol>
+
+  <CodeBlock language="TypeScript" code={`import jwt from 'jsonwebtoken';
+
+interface TokenPayload {
+  userId: string;
+  email: string;
+  role: 'user' | 'admin';
+}
+
+// Generar tokens
+function generateTokens(payload: TokenPayload) {
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
+    expiresIn: '15m'  // Corta duración
+  });
+  
+  const refreshToken = jwt.sign(
+    { userId: payload.userId },
+    process.env.REFRESH_SECRET!,
+    { expiresIn: '7d' }  // Larga duración
+  );
+  
+  return { accessToken, refreshToken };
+}
+
+// Verificar token
+function verifyToken(token: string): TokenPayload {
+  return jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+}
+
+// Middleware de autenticación
+function authMiddleware(req: Request) {
+  const authHeader = req.headers.get('Authorization');
+  
+  if (!authHeader?.startsWith('Bearer ')) {
+    throw new Error('No token provided');
+  }
+  
+  const token = authHeader.split(' ')[1];
+  return verifyToken(token);
+}`} />
+
+  <div class="callout callout-warning">
+    <div class="callout-title">⚠️ Seguridad</div>
+    <p>
+      <strong>Nunca</strong> guardes JWT en localStorage para apps con datos sensibles.
+      Usa httpOnly cookies o refresh tokens con rotación.
+    </p>
+  </div>
+
+  <hr />
+
+  <h2>Git Commands</h2>
+
+  <p>Comandos de Git que uso frecuentemente organizados por categoría:</p>
+
+  <h3>Staging y Commits</h3>
+
+  <CodeBlock language="Bash" code={`# Stage específico
+git add src/components/Button.tsx
+
+# Stage todo excepto archivos sensibles
+git add .
+git reset HEAD .env
+
+# Commit con mensaje descriptivo
+git commit -m "feat(auth): add JWT refresh token rotation
+
+- Implement refresh token generation
+- Add token verification middleware
+- Update auth flow to handle expired tokens
+
+Closes #123"
+
+# Amend último commit (solo si no se ha pusheado)
+git commit --amend --no-edit`} />
+
+  <h3>Branches</h3>
+
+  <CodeBlock language="Bash" code={`# Crear y cambiar a branch
+git checkout -b feature/user-profile
+
+# Ver todos los branches
+git branch -a
+
+# Merge de main a feature
+git checkout feature/user-profile
+git merge main
+
+# Rebase para mantener historial limpio
+git rebase main`} />
+
+  <h3>Resolución de conflictos</h3>
+
+  <CodeBlock language="Bash" code={`# Ver conflictos
+git status
+
+# Resolver conflictos manualmente en los archivos
+# Luego:
+git add .
+git commit -m "resolve: merge conflicts in auth middleware"
+
+# O abortar merge
+git merge --abort`} />
+
+  <div class="callout callout-success">
+    <div class="callout-title">✅ Tip</div>
+    <p>
+      Usa <code>git log --oneline --graph --all</code> para ver el historial de branches
+      de forma visual. Es útil para entender la estructura del repo.
+    </p>
+  </div>
+</Layout>

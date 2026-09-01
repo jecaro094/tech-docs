@@ -1,0 +1,233 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+---
+
+<Layout title="Notas" activePage="notes">
+  <h1>📝 Notas</h1>
+  <p>
+    Notas personales sobre patrones de diseño, arquitectura de software,
+    y buenas prácticas que he aprendido con la experiencia.
+  </p>
+
+  <h2>Patrones de Diseño</h2>
+
+  <h3>Singleton</h3>
+
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+    <span class="tag">Creacional</span>
+    <span class="tag">GoF</span>
+  </div>
+
+  <p>
+    Garantiza que una clase tenga solo una instancia y proporciona un punto de acceso global a ella.
+    Útil para conexiones de base de datos, loggers, y configuración compartida.
+  </p>
+
+  <CodeBlock language="TypeScript" code={`class DatabaseConnection {
+  private static instance: DatabaseConnection;
+  private connection: any;
+
+  private constructor() {
+    // Constructor privado - no se puede instanciar con new
+    this.connection = this.createConnection();
+  }
+
+  static getInstance(): DatabaseConnection {
+    if (!DatabaseConnection.instance) {
+      DatabaseConnection.instance = new DatabaseConnection();
+    }
+    return DatabaseConnection.instance;
+  }
+
+  private createConnection() {
+    // Lógica de conexión a DB
+    return { connected: true };
+  }
+
+  query(sql: string) {
+    return this.connection;
+  }
+}
+
+// Uso
+const db1 = DatabaseConnection.getInstance();
+const db2 = DatabaseConnection.getInstance();
+console.log(db1 === db2); // true - misma instancia`} />
+
+  <div class="callout callout-warning">
+    <div class="callout-title">⚠️ Cuidado</div>
+    <p>
+      El Singleton es a menudo sobreusado. En TypeScript/JavaScript moderno,
+      un simple módulo exportado puede ser suficiente en muchos casos.
+      Úsalo solo cuando realmente necesites una sola instancia global.
+    </p>
+  </div>
+
+  <hr />
+
+  <h3>Observer</h3>
+
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+    <span class="tag">Comportamiento</span>
+    <span class="tag">GoF</span>
+    <span class="tag">Events</span>
+  </div>
+
+  <p>
+    Define una dependencia uno a muchos entre objetos, de modo que cuando un objeto cambia de estado,
+    todos sus dependientes son notificados y actualizados automáticamente.
+  </p>
+
+  <CodeBlock language="TypeScript" code={`interface Observer {
+  update(event: string, data: any): void;
+}
+
+class EventEmitter {
+  private listeners: Map<string, Observer[]> = new Map();
+
+  on(event: string, observer: Observer) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, []);
+    }
+    this.listeners.get(event)!.push(observer);
+  }
+
+  off(event: string, observer: Observer) {
+    const observers = this.listeners.get(event);
+    if (observers) {
+      const index = observers.indexOf(observer);
+      if (index > -1) {
+        observers.splice(index, 1);
+      }
+    }
+  }
+
+  emit(event: string, data: any) {
+    const observers = this.listeners.get(event) || [];
+    observers.forEach(observer => observer.update(event, data));
+  }
+}
+
+// Uso
+const emitter = new EventEmitter();
+
+class Logger implements Observer {
+  update(event: string, data: any) {
+    console.log(\`[\${event}]\`, data);
+  }
+}
+
+const logger = new Logger();
+emitter.on('user:created', logger);
+emitter.emit('user:created', { id: 1, name: 'John' });`} />
+
+  <hr />
+
+  <h2>Arquitectura</h2>
+
+  <h3>Clean Architecture</h3>
+
+  <p>
+    Principios de Clean Architecture que aplico en proyectos escalables:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Capa</th>
+        <th>Responsabilidad</th>
+        <th>Ejemplo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Entities</strong></td>
+        <td>Lógica de negocio core</td>
+        <td>User, Order, Product</td>
+      </tr>
+      <tr>
+        <td><strong>Use Cases</strong></td>
+        <td>Orquestación de operaciones</td>
+        <td>CreateUser, ProcessOrder</td>
+      </tr>
+      <tr>
+        <td><strong>Interface Adapters</strong></td>
+        <td>Convertir datos entre capas</td>
+        <td>UserRepository, OrderController</td>
+      </tr>
+      <tr>
+        <td><strong>Frameworks</strong></td>
+        <td>Detalles de implementación</td>
+        <td>Express, PostgreSQL, Redis</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <CodeBlock language="Estructura de directorios" code={`src/
+├── domain/           # Entidades y lógica de negocio
+│   ├── entities/
+│   │   ├── User.ts
+│   │   └── Order.ts
+│   └── interfaces/
+│       └── UserRepository.ts
+├── application/      # Casos de uso
+│   ├── use-cases/
+│   │   ├── CreateUser.ts
+│   │   └── ProcessOrder.ts
+│   └── dtos/
+│       └── CreateUserDTO.ts
+├── infrastructure/   # Implementaciones externas
+│   ├── database/
+│   │   └── PostgresUserRepository.ts
+│   └── external/
+│       └── StripePaymentGateway.ts
+└── presentation/     # Capa de presentación
+    ├── http/
+    │   └── UserController.ts
+    └── cli/
+        └── UserCLI.ts`} />
+
+  <hr />
+
+  <h2>TypeScript Tips</h2>
+
+  <h3>Utility Types útiles</h3>
+
+  <CodeBlock language="TypeScript" code={`// Hacer todos los campos requeridos excepto uno
+type CreateWithoutId<T> = Omit<T, 'id'> & Partial<Pick<T, 'id'>>;
+
+// Deep partial
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+// Extract function parameters as object
+type Params<T extends (...args: any) => any> = 
+  T extends (...args: infer P) => any ? P : never;
+
+// Make specific fields required
+type WithRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+// Ejemplo de uso
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+type CreateUserDTO = CreateWithoutId<User>;
+// Resultado: { name: string; email: string; avatar?: string; }
+
+type UserWithAvatar = WithRequired<User, 'avatar'>;
+// Resultado: User con avatar requerido`} />
+
+  <div class="callout callout-success">
+    <div class="callout-title">✅ Recomendación</div>
+    <p>
+      Revisa <code>typescriptlang.org/docs/handbook/utility-types.html</code> para la lista completa
+      de utility types. Conocerlas bien te ahorrará mucho tiempo.
+    </p>
+  </div>
+</Layout>
