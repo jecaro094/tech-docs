@@ -1,92 +1,55 @@
 ---
-interface Props {
+import '../styles/global.css';
+import '../styles/project.css';
+import '../styles/landing.css';
+
+export interface Props {
   title: string;
-  activePage?: string;
+  description?: string;
 }
 
-const { title, activePage = '' } = Astro.props;
+const { title, description = 'Landing page built with Astro' } = Astro.props;
+const currentYear = new Date().getFullYear();
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{title} | Tech Docs</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
-</head>
-<body>
-  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-    ☰
-  </button>
-  
-  <div class="layout">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <a href="/" style="text-decoration: none;">
-          <div class="sidebar-title">📚 Tech Docs</div>
-          <div class="sidebar-subtitle">Documentación personal</div>
-        </a>
-      </div>
-      
-      <nav>
-        <div class="nav-section">
-          <div class="nav-section-title">Principal</div>
-          <a href="/" class:list={["nav-link", { active: activePage === 'home' }]}>
-            Inicio
-          </a>
-        </div>
-        
-        <div class="nav-section">
-          <div class="nav-section-title">Categorías</div>
-          <a href="/interviews" class:list={["nav-link", { active: activePage === 'interviews' }]}>
-            🎯 Entrevistas
-          </a>
-          <a href="/docs" class:list={["nav-link", { active: activePage === 'docs' }]}>
-            📖 Documentación
-          </a>
-          <a href="/notes" class:list={["nav-link", { active: activePage === 'notes' }]}>
-            📝 Notas
-          </a>
-          <a href="/snippets" class:list={["nav-link", { active: activePage === 'snippets' }]}>
-            💻 Snippets
-          </a>
-        </div>
-        
-        <div class="nav-section">
-          <div class="nav-section-title">Recursos</div>
-          <a href="https://github.com" target="_blank" class="nav-link">
-            🔗 GitHub
-          </a>
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">Tech Docs</a>
+      <nav aria-label="Sections">
+        <a href="#features">Features</a>
+        <a href="#demo">Demo</a>
+        <a href="#tech-stack">Tech Stack</a>
+        <a href="#faq">FAQ</a>
       </nav>
-    </aside>
-    
-    <main class="main-content">
-      <slot />
-    </main>
-  </div>
-  
-  <style>
-    @import '../styles/global.css';
-  </style>
-  
-  <script>
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    
-    menuToggle?.addEventListener('click', () => {
-      sidebar?.classList.toggle('open');
-    });
-    
-    document.addEventListener('click', (e) => {
-      if (window.innerWidth <= 768 && 
-          sidebar?.classList.contains('open') && 
-          !sidebar.contains(e.target as Node) && 
-          e.target !== menuToggle) {
-        sidebar.classList.remove('open');
-      }
-    });
-  </script>
-</body>
+    </header>
+    <slot />
+    <footer class="site-footer">
+      <p>&copy; {currentYear} Tech Docs</p>
+    </footer>
+  </body>
 </html>
+
+<script>
+  function scrollToHash() {
+    const hash = window.location.hash;
+    if (!hash) return;
+    const target = document.querySelector(hash);
+    if (target) {
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }
+
+  window.addEventListener('load', scrollToHash);
+  window.addEventListener('hashchange', scrollToHash);
+</script>
