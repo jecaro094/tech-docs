@@ -1,13 +1,29 @@
 :root {
   --bg: #0f1115;
-  --fg: #e6e8eb;
-  --muted: #9aa0a8;
-  --accent: #4f8cff;
+  --fg: #e4ece6;
+  --muted: #97a89d;
+  --accent: #3ddc84;
+  --accent-strong: #2bb673;
+  --lime: #c6ff4f;
   --border: #262a33;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono",
+    Menlo, monospace;
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4,
+.site-header .brand {
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
 }
 
 html {
+  font-size: 106.25%; /* ~17px base; all rem sizes scale up a touch */
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
 }
@@ -41,7 +57,7 @@ body::after {
 body::before {
   width: 42vw;
   height: 42vw;
-  background: rgba(79, 140, 255, 0.16);
+  background: rgba(61, 220, 132, 0.16);
   top: -12vw;
   left: -12vw;
   animation: drift-a 20s ease-in-out infinite;
@@ -50,7 +66,7 @@ body::before {
 body::after {
   width: 36vw;
   height: 36vw;
-  background: rgba(140, 90, 255, 0.13);
+  background: rgba(198, 255, 79, 0.12);
   bottom: -12vw;
   right: -10vw;
   animation: drift-b 26s ease-in-out infinite;
@@ -76,7 +92,7 @@ body::after {
 }
 
 .gradient-text {
-  background: linear-gradient(90deg, var(--fg) 20%, var(--accent) 80%);
+  background: linear-gradient(90deg, var(--accent) 10%, var(--lime) 90%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -149,76 +165,56 @@ main {
   font-size: 0.875rem;
 }
 
-/* Code block (Astro docs style) */
+/* Code block */
 .expressive-code {
   position: relative;
   margin: 1.5rem 0;
   border-radius: 0.5rem;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
-  background: #23262f;
+  border: 1px solid var(--border);
+  background: linear-gradient(145deg, #171b23, #12151b);
 }
 
-.expressive-code .frame-header {
-  background: #000;
-  padding: 0.6rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--muted);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-}
-
-.expressive-code .frame-header .dots {
-  display: flex;
-  gap: 0.35rem;
-}
-
-.expressive-code .frame-header .dot {
-  width: 0.6rem;
-  height: 0.6rem;
-  border-radius: 50%;
-  background: #444;
-}
-
-.expressive-code .frame-header .copy-btn {
-  margin-left: auto;
+.expressive-code .copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
   font: inherit;
-  font-size: 0.7rem;
+  font-size: 1rem;
   line-height: 1;
-  padding: 0.3rem 0.6rem;
+  padding: 0.25rem 0.5rem;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: 6px;
   cursor: pointer;
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
-.expressive-code .frame-header .copy-btn:hover {
+.expressive-code .copy-btn:hover {
   color: var(--fg);
   background: rgba(255, 255, 255, 0.1);
 }
 
-.expressive-code .frame-header .copy-btn.copied {
-  color: #c3e88d;
-  border-color: rgba(195, 232, 141, 0.4);
+.expressive-code .copy-btn.copied {
+  color: var(--lime);
+  border-color: rgba(198, 255, 79, 0.4);
 }
 
 .expressive-code :is(pre, .astro-code) {
   margin: 0;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
   overflow-x: auto;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: 15px; /* pinned; does not follow the global scale */
   line-height: 1.7;
-  color: #d6deeb;
+  color: #d4d4d4; /* fallback for untokenised text, matches VS Code Dark Modern */
   tab-size: 4;
 }
 
 .expressive-code .astro-code {
-  background: #23262f !important;
+  background: transparent !important;
 }
 
 .expressive-code code {

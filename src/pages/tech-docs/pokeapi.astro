@@ -64,22 +64,14 @@ const { Content } = await render(entry);
         <section class="section animate" id="code" style="animation-delay: 0.4s">
           <h2>Code Example</h2>
           <div class="expressive-code">
-            <div class="frame-header">
-              <div class="dots">
-                <span class="dot" />
-                <span class="dot" />
-                <span class="dot" />
-              </div>
-              <span>{code.filename}</span>
-              <button
-                class="copy-btn"
-                type="button"
-                aria-label="Copy code to clipboard"
-              >
-                Copy
-              </button>
-            </div>
-            <Code code={code.source} lang={code.lang} theme="night-owl" />
+            <button
+              class="copy-btn"
+              type="button"
+              aria-label="Copy code to clipboard"
+            >
+              ⧉
+            </button>
+            <Code code={code.source} lang={code.lang} theme="dark-plus" />
           </div>
         </section>
       )
@@ -148,13 +140,13 @@ const { Content } = await render(entry);
     btn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(pre.innerText);
-        btn.textContent = 'Copied!';
+        btn.textContent = '✓';
         btn.classList.add('copied');
       } catch {
-        btn.textContent = 'Failed';
+        btn.textContent = '✕';
       }
       window.setTimeout(() => {
-        btn.textContent = 'Copy';
+        btn.textContent = '⧉';
         btn.classList.remove('copied');
       }, 2000);
     });
