@@ -1,0 +1,211 @@
+/*
+ * Prose styles for a rendered Markdown doc.
+ *
+ * Everything here is scoped under `.doc` (the <article> wrapper in
+ * src/pages/tech-docs/[...slug].astro) so it never leaks into the landing page.
+ * Colours come from the global theme tokens in global.css.
+ */
+
+.doc {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1rem 0 3rem;
+}
+
+.doc-back {
+  display: inline-block;
+  margin-bottom: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.doc-back:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Headings */
+.doc :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-mono);
+  line-height: 1.25;
+  scroll-margin-top: 5rem;
+}
+.doc h1 {
+  font-size: 2.2rem;
+  margin: 0 0 1rem;
+}
+.doc h2 {
+  font-size: 1.55rem;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+}
+.doc h3 {
+  font-size: 1.2rem;
+  margin: 2rem 0 0.75rem;
+}
+.doc h4 {
+  font-size: 1.05rem;
+  margin: 1.5rem 0 0.5rem;
+}
+.doc h5,
+.doc h6 {
+  font-size: 0.95rem;
+  margin: 1.25rem 0 0.5rem;
+  color: var(--muted);
+}
+
+/* Text flow */
+.doc p,
+.doc li {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+.doc p {
+  margin: 0 0 1.15rem;
+}
+
+.doc :is(ul, ol) {
+  margin: 0 0 1.15rem;
+  padding-left: 1.5rem;
+}
+.doc li {
+  margin: 0.35rem 0;
+}
+.doc li::marker {
+  color: var(--accent);
+}
+.doc li > ul,
+.doc li > ol {
+  margin: 0.35rem 0;
+}
+
+.doc a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.doc a:hover {
+  color: var(--lime);
+}
+
+.doc strong {
+  color: #fff;
+}
+
+.doc blockquote {
+  margin: 0 0 1.15rem;
+  padding: 0.4rem 0 0.4rem 1.1rem;
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+  font-style: italic;
+}
+.doc blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.doc hr {
+  border: 0;
+  height: 1px;
+  background: var(--border);
+  margin: 2.5rem 0;
+}
+
+.doc img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+/* Tables — `display: block` lets a wide table scroll instead of the page body */
+.doc table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  max-width: 100%;
+  margin: 0 0 1.15rem;
+  font-size: 0.95rem;
+}
+.doc :is(th, td) {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+.doc th {
+  background: rgba(255, 255, 255, 0.04);
+  font-family: var(--font-mono);
+  color: var(--fg);
+}
+.doc tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Inline code (fenced blocks are handled by .expressive-code in global.css) */
+.doc :not(pre) > code {
+  background: rgba(61, 220, 132, 0.12);
+  border: 1px solid rgba(61, 220, 132, 0.3);
+  border-radius: 6px;
+  padding: 0.12rem 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: var(--lime);
+  white-space: nowrap;
+}
+
+/*
+ * Admonitions — emitted by remarkAdmonitions in src/lib/markdown.ts as an
+ * aside carrying the classes "admonition" and "admonition-{kind}".
+ */
+.doc .admonition {
+  --adm-accent: var(--accent);
+  margin: 1.5rem 0;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--adm-accent) 40%, transparent);
+  border-left: 3px solid var(--adm-accent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--adm-accent) 8%, var(--bg));
+}
+.doc .admonition > :last-child {
+  margin-bottom: 0;
+}
+.doc .admonition-title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--adm-accent);
+}
+.doc .admonition-icon {
+  margin-right: 0.4rem;
+}
+
+.doc .admonition-note {
+  --adm-accent: #9aa7b2;
+}
+.doc .admonition-info {
+  --adm-accent: #4aa3ff;
+}
+.doc .admonition-tip {
+  --adm-accent: var(--accent);
+}
+.doc .admonition-warning {
+  --adm-accent: #e0b341;
+}
+.doc .admonition-danger {
+  --adm-accent: #f2555a;
+}
+
+@media (max-width: 640px) {
+  .doc h1 {
+    font-size: 1.8rem;
+  }
+  .doc h2 {
+    font-size: 1.35rem;
+  }
+}

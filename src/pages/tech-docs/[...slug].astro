@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const docs = await getCollection('techDocs');
+  return docs.map((doc) => ({
+    params: { slug: doc.id },
+    props: { doc },
+  }));
+}
+
+const { doc } = Astro.props;
+const { Content } = await render(doc);
+
+const title = doc.data.title ?? doc.id;
+---
+
+<Layout title={`${title} — Tech Docs`} description={doc.data.tagline} editSlug={doc.id}>
+  <main>
+    <article class="doc animate">
+      <a class="doc-back" href="/">← All docs</a>
+      <Content />
+    </article>
+  </main>
+</Layout>
+
+<script>
+  // Wire the copy button that rehypeCodeFrame adds around every <pre>.
+  document.querySelectorAll<HTMLElement>('.expressive-code').forEach((frame) => {
+    const btn = frame.querySelector<HTMLButtonElement>('.copy-btn');
+    const pre = frame.querySelector('pre');
+    if (!btn || !pre) return;
+
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.innerText);
+        btn.textContent = '✓';
+        btn.classList.add('copied');
+      } catch {
+        btn.textContent = '✕';
+      }
+      window.setTimeout(() => {
+        btn.textContent = '⧉';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  });
+</script>

@@ -2,7 +2,9 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 
-const docs = await getCollection('techDocs');
+const docs = (await getCollection('techDocs')).sort((a, b) =>
+  (a.data.title ?? a.id).localeCompare(b.data.title ?? b.id),
+);
 ---
 
 <Layout
@@ -21,16 +23,23 @@ const docs = await getCollection('techDocs');
 
     <section class="section animate" id="docs" style="animation-delay: 0.2s">
       <h2>Documentation</h2>
-      <div class="features-grid">
-        {
-          docs.map((doc) => (
-            <a href={`/tech-docs/${doc.id}`} class="feature-card">
-              <h3>{doc.data.title}</h3>
-              <p>{doc.data.tagline}</p>
-            </a>
-          ))
-        }
-      </div>
+      {
+        docs.length === 0 ? (
+          <p class="subtitle">
+            No docs found in <code>DOCS_DIR</code> yet. Drop a <code>.md</code>{' '}
+            file there and it shows up here.
+          </p>
+        ) : (
+          <div class="features-grid">
+            {docs.map((doc) => (
+              <a href={`/tech-docs/${doc.id}`} class="feature-card">
+                <h3>{doc.data.title ?? doc.id}</h3>
+                {doc.data.tagline && <p>{doc.data.tagline}</p>}
+              </a>
+            ))}
+          </div>
+        )
+      }
     </section>
   </main>
 </Layout>

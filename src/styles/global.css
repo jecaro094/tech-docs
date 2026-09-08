@@ -149,6 +149,14 @@ a:hover {
   color: var(--fg);
 }
 
+/* Dev-only Edit link (added by Layout when running under `astro dev`). */
+.site-header nav a.edit-link {
+  color: var(--accent);
+}
+.site-header nav a.edit-link:hover {
+  color: var(--lime);
+}
+
 main {
   flex: 1;
   padding: 2rem;

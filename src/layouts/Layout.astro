@@ -2,18 +2,22 @@
 import '../styles/global.css';
 import '../styles/project.css';
 import '../styles/landing.css';
+import '../styles/content.css';
 
 export interface Props {
   title: string;
   description?: string;
+  /** Doc id. When set (and running under `astro dev`) the header shows an Edit link. */
+  editSlug?: string;
 }
 
-const { title, description = 'Landing page built with Astro' } = Astro.props;
+const { title, description = 'Landing page built with Astro', editSlug } = Astro.props;
+const showEdit = import.meta.env.DEV && Boolean(editSlug);
 const currentYear = new Date().getFullYear();
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,10 +35,8 @@ const currentYear = new Date().getFullYear();
     <header class="site-header">
       <a class="brand" href="/">Tech Docs</a>
       <nav aria-label="Sections">
-        <a href="#features">Features</a>
-        <a href="#demo">Demo</a>
-        <a href="#tech-stack">Tech Stack</a>
-        <a href="#faq">FAQ</a>
+        <a href="/#docs">All docs</a>
+        {showEdit && <a href={`/tech-docs/${editSlug}/edit`} class="edit-link">Edit</a>}
       </nav>
     </header>
     <slot />
