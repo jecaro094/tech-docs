@@ -12,7 +12,7 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import yaml from 'js-yaml';
-import { splitFrontmatter } from '../../lib/markdown';
+import { splitFrontmatter } from '@jecaro/md-editor/markdown';
 import { resolveDocPath, DocPathError } from '../../lib/docs';
 
 export const prerender = false;

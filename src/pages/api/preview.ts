@@ -3,12 +3,12 @@
  *
  * `POST { content: string }` — the full raw `.md` buffer. The frontmatter is
  * split off and validated as YAML; the body is compiled through the *same*
- * pipeline as the published pages (`src/lib/markdown.ts`) so the preview and the
+ * pipeline as the published pages (`@jecaro/md-editor/markdown`) so the preview and the
  * built page can never diverge. Dev-only: 404 in a static build.
  */
 import type { APIRoute } from 'astro';
 import yaml from 'js-yaml';
-import { renderMarkdown, splitFrontmatter } from '../../lib/markdown';
+import { renderMarkdown, splitFrontmatter } from '@jecaro/md-editor/markdown';
 
 export const prerender = false;
 

@@ -11,9 +11,9 @@ export const prerender = false;
 
 import fs from 'node:fs/promises';
 import { resolveDocPath, DocPathError } from '../../../lib/docs';
-import { renderMarkdown, splitFrontmatter } from '../../../lib/markdown';
+import { renderMarkdown, splitFrontmatter } from '@jecaro/md-editor/markdown';
 import '../../../styles/global.css';
-import '../../../styles/content.css';
+import '@jecaro/md-editor/styles/doc.css';
 import '../../../styles/editor.css';
 
 if (!import.meta.env.DEV) {
