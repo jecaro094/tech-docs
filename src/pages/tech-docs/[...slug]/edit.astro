@@ -4,9 +4,9 @@
  *
  * This page is a thin host around `@jecaro/md-editor`: it owns the DEV guard,
  * the `DOCS_DIR` filesystem access and the server render of the first preview,
- * then hands everything else — CodeMirror, the debounced preview, dirty
- * tracking, toasts, the split/source toggle, `:::` snippets — to `mountEditor`.
- * On a static build `import.meta.env.DEV` is false and this route 404s.
+ * then hands everything else — CodeMirror, the inline/split/source modes, dirty
+ * tracking, toasts, the `/` menu — to `mountEditor`. On a static build
+ * `import.meta.env.DEV` is false and this route 404s.
  */
 export const prerender = false;
 
@@ -16,6 +16,7 @@ import { renderMarkdown, splitFrontmatter } from '@jecaro/md-editor/markdown';
 import '../../../styles/global.css';
 import '@jecaro/md-editor/styles/editor.css';
 import '@jecaro/md-editor/styles/doc.css';
+import '@jecaro/md-editor/styles/inline.css';
 
 if (!import.meta.env.DEV) {
   return new Response('The editor is only available under `astro dev`.', {
@@ -79,7 +80,7 @@ try {
         const slug = app.dataset.slug ?? '';
         mountEditor(app, {
           value: srcEl.value,
-          mode: 'split',
+          mode: 'inline',
           title: `${slug}.md`,
           initialPreviewHtml:
             document.querySelector<HTMLElement>('#initial-preview')?.innerHTML,

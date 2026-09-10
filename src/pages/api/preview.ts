@@ -1,10 +1,17 @@
 /**
  * Live-preview endpoint for the editor (Fase 2, point 13).
  *
- * `POST { content: string }` — the full raw `.md` buffer. The frontmatter is
- * split off and validated as YAML; the body is compiled through the *same*
- * pipeline as the published pages (`@jecaro/md-editor/markdown`) so the preview and the
- * built page can never diverge. Dev-only: 404 in a static build.
+ * Two request shapes:
+ *   - `POST { content: string }` — the full raw `.md` buffer. The frontmatter is
+ *     split off and validated as YAML; the body is compiled and returned as
+ *     `{ html }`. Used by split mode.
+ *   - `POST { blocks: string[] }` — N self-contained Markdown fragments, each
+ *     compiled independently and returned in order as `{ htmls: string[] }`.
+ *     Used by inline mode to render its live-preview block widgets in one call.
+ *
+ * Both go through the *same* pipeline as the published pages
+ * (`@jecaro/md-editor/markdown`) so the preview and the built page can never
+ * diverge. Dev-only: 404 in a static build.
  */
 import type { APIRoute } from 'astro';
 import yaml from 'js-yaml';
@@ -22,16 +29,32 @@ function json(data: unknown, status = 200): Response {
 export const POST: APIRoute = async ({ request }) => {
   if (!import.meta.env.DEV) return new Response('Not found', { status: 404 });
 
-  let content: string;
+  let payload: { content?: unknown; blocks?: unknown };
   try {
-    const body = (await request.json()) as { content?: unknown };
-    if (typeof body.content !== 'string') {
-      return json({ error: 'Expected { content: string }' }, 400);
-    }
-    content = body.content;
+    payload = (await request.json()) as { content?: unknown; blocks?: unknown };
   } catch {
     return json({ error: 'Invalid JSON body' }, 400);
   }
+
+  // Inline mode: render an array of standalone blocks in one round-trip.
+  if (Array.isArray(payload.blocks)) {
+    if (!payload.blocks.every((b) => typeof b === 'string')) {
+      return json({ error: 'Expected { blocks: string[] }' }, 400);
+    }
+    try {
+      const htmls = await Promise.all(
+        (payload.blocks as string[]).map((block) => renderMarkdown(block)),
+      );
+      return json({ htmls });
+    } catch (err) {
+      return json({ error: `Render failed: ${(err as Error).message}` }, 500);
+    }
+  }
+
+  if (typeof payload.content !== 'string') {
+    return json({ error: 'Expected { content: string } or { blocks: string[] }' }, 400);
+  }
+  const content: string = payload.content;
 
   const { frontmatter, body } = splitFrontmatter(content);
   if (frontmatter !== null) {
