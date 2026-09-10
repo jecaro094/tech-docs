@@ -1,11 +1,12 @@
 ---
 /*
- * Dev-only Markdown editor (Fase 2, point 12).
+ * Dev-only Markdown editor.
  *
- * Reads the raw `.md` from DOCS_DIR, server-renders the first preview so the
- * pane is populated before JS boots, then hands off to a CodeMirror 6 client
- * script for live editing. On a static build `import.meta.env.DEV` is false and
- * this route 404s — the published site is read-only, as decided in PLAN.md.
+ * This page is a thin host around `@jecaro/md-editor`: it owns the DEV guard,
+ * the `DOCS_DIR` filesystem access and the server render of the first preview,
+ * then hands everything else — CodeMirror, the debounced preview, dirty
+ * tracking, toasts, the split/source toggle, `:::` snippets — to `mountEditor`.
+ * On a static build `import.meta.env.DEV` is false and this route 404s.
  */
 export const prerender = false;
 
@@ -13,8 +14,8 @@ import fs from 'node:fs/promises';
 import { resolveDocPath, DocPathError } from '../../../lib/docs';
 import { renderMarkdown, splitFrontmatter } from '@jecaro/md-editor/markdown';
 import '../../../styles/global.css';
+import '@jecaro/md-editor/styles/editor.css';
 import '@jecaro/md-editor/styles/doc.css';
-import '../../../styles/editor.css';
 
 if (!import.meta.env.DEV) {
   return new Response('The editor is only available under `astro dev`.', {
@@ -29,10 +30,8 @@ let initialHtml = '';
 let loadError: string | null = null;
 
 try {
-  const target = resolveDocPath(slug);
-  raw = await fs.readFile(target, 'utf8');
-  const { body } = splitFrontmatter(raw);
-  initialHtml = await renderMarkdown(body);
+  raw = await fs.readFile(resolveDocPath(slug), 'utf8');
+  initialHtml = await renderMarkdown(splitFrontmatter(raw).body);
 } catch (err) {
   if (err instanceof DocPathError) {
     loadError = err.message;
@@ -52,8 +51,9 @@ try {
     <meta name="robots" content="noindex" />
     <title>Editing {slug} — Tech Docs</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>html, body { height: 100%; margin: 0; } #app { height: 100%; }</style>
   </head>
-  <body class="editor-page">
+  <body class="mde-host">
     {
       loadError ? (
         <div class="editor-error">
@@ -62,249 +62,47 @@ try {
         </div>
       ) : (
         <>
-          <header class="editor-bar">
-            <a href={`/tech-docs/${slug}`}>← Back</a>
-            <span class="editor-title">{slug}.md</span>
-            <span class="editor-status" id="status" data-dirty="false">Saved</span>
-            <div class="editor-actions">
-              <a href={`/tech-docs/${slug}`} target="_blank" rel="noreferrer">
-                View ↗
-              </a>
-              <button
-                type="button"
-                id="toggle-preview"
-                class="editor-toggle"
-                aria-pressed="true"
-                title="Toggle the preview pane"
-              >
-                Preview
-              </button>
-              <button type="button" id="save">Save</button>
-            </div>
-          </header>
-
-          <div class="editor-main" data-slug={slug} data-preview="on">
-            <div class="editor-pane" id="editor" />
-            <article class="editor-pane doc" id="preview" set:html={initialHtml} />
-          </div>
-
+          <div id="app" data-slug={slug} />
           <textarea id="doc-src" hidden>{raw}</textarea>
-          <div class="toast-stack" id="toasts" aria-live="polite" />
-
-          {/* Apply the persisted view mode before paint to avoid a split-view flash. */}
-          <script is:inline>
-            try {
-              if (localStorage.getItem('editor:preview') === 'off') {
-                document
-                  .querySelector('.editor-main')
-                  ?.setAttribute('data-preview', 'off');
-                document
-                  .querySelector('#toggle-preview')
-                  ?.setAttribute('aria-pressed', 'false');
-              }
-            } catch (e) {}
-          </script>
+          <div id="initial-preview" hidden set:html={initialHtml} />
         </>
       )
     }
 
     <script>
-      import { EditorView, basicSetup } from 'codemirror';
-      import { keymap } from '@codemirror/view';
-      import { EditorState } from '@codemirror/state';
-      import { indentWithTab } from '@codemirror/commands';
-      import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
-      import { languages } from '@codemirror/language-data';
-      import { oneDark } from '@codemirror/theme-one-dark';
-      import { autocompletion, snippetCompletion } from '@codemirror/autocomplete';
-      import type { CompletionContext } from '@codemirror/autocomplete';
+      import { mountEditor } from '@jecaro/md-editor';
+      import { remoteRenderer, httpSave } from '@jecaro/md-editor/adapters/http';
 
-      const main = document.querySelector<HTMLElement>('.editor-main');
+      const app = document.querySelector<HTMLElement>('#app');
       const srcEl = document.querySelector<HTMLTextAreaElement>('#doc-src');
-      const previewEl = document.querySelector<HTMLElement>('#preview');
-      const statusEl = document.querySelector<HTMLElement>('#status');
-      const saveBtn = document.querySelector<HTMLButtonElement>('#save');
-      const toggleBtn = document.querySelector<HTMLButtonElement>('#toggle-preview');
-      const toastStack = document.querySelector<HTMLElement>('#toasts');
-
-      if (main && srcEl && previewEl && statusEl && saveBtn && toggleBtn && toastStack) {
-        const slug = main.dataset.slug ?? '';
-
-        // View mode: `split` (editor + preview) or `editor` (preview hidden).
-        // Seeded from the inline pre-paint script's `data-preview`, persisted to
-        // localStorage. While the preview is hidden we skip `/api/preview`
-        // entirely and re-render once when it comes back.
-        let previewVisible = main.dataset.preview !== 'off';
-
-        function toast(message: string, kind: 'ok' | 'danger' = 'ok') {
-          const el = document.createElement('div');
-          el.className = `toast toast-${kind}`;
-          el.textContent = message;
-          toastStack!.append(el);
-          window.setTimeout(() => el.remove(), kind === 'danger' ? 6000 : 3000);
-        }
-
-        // Wire the copy button rehypeCodeFrame adds around each <pre> — same
-        // behaviour as the published page (Fase 3, point 16).
-        function wireCopyButtons(root: ParentNode) {
-          root.querySelectorAll<HTMLElement>('.expressive-code').forEach((frame) => {
-            const btn = frame.querySelector<HTMLButtonElement>('.copy-btn');
-            const pre = frame.querySelector('pre');
-            if (!btn || !pre || btn.dataset.wired) return;
-            btn.dataset.wired = 'true';
-            btn.addEventListener('click', async () => {
-              try {
-                await navigator.clipboard.writeText(pre.innerText);
-                btn.textContent = '✓';
-                btn.classList.add('copied');
-              } catch {
-                btn.textContent = '✕';
-              }
-              window.setTimeout(() => {
-                btn.textContent = '⧉';
-                btn.classList.remove('copied');
-              }, 2000);
-            });
-          });
-        }
-        wireCopyButtons(previewEl);
-
-        // --- dirty tracking (Fase 3, point 18) ------------------------------
-        let savedText = srcEl.value;
-        const isDirty = () => view.state.doc.toString() !== savedText;
-        function refreshStatus() {
-          const dirty = isDirty();
-          statusEl!.dataset.dirty = String(dirty);
-          statusEl!.textContent = dirty ? 'Unsaved' : 'Saved';
-        }
-
-        // --- live preview, debounced ~200ms (point 13) --------------------
-        let previewTimer: number | undefined;
-        let previewSeq = 0;
-        function schedulePreview() {
-          if (!previewVisible) return; // pane is hidden — nothing to update
-          window.clearTimeout(previewTimer);
-          previewTimer = window.setTimeout(runPreview, 200);
-        }
-        async function runPreview() {
-          const seq = ++previewSeq;
-          try {
-            const res = await fetch('/api/preview', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ content: view.state.doc.toString() }),
-            });
-            const data = await res.json();
-            if (seq !== previewSeq) return; // a newer keystroke already won
-            if (!res.ok) {
-              toast(data.error ?? 'Preview failed', 'danger');
-              return;
-            }
-            previewEl!.innerHTML = data.html;
-            wireCopyButtons(previewEl!);
-          } catch {
-            if (seq === previewSeq) toast('Preview request failed', 'danger');
-          }
-        }
-
-        // --- save (point 14) --------------------------------------------
-        async function save() {
-          if (!isDirty()) return;
-          saveBtn!.disabled = true;
-          try {
-            const res = await fetch('/api/save', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ slug, content: view.state.doc.toString() }),
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok || !data.ok) {
-              toast(data.error ?? `Save failed (${res.status})`, 'danger');
-              return;
-            }
-            savedText = view.state.doc.toString();
-            refreshStatus();
-            toast('Saved to disk');
-            // The Content Layer watches DOCS_DIR and should HMR the published
-            // page on its own; the preview pane here is already current, so
-            // there is nothing else to refresh (Fase 2, point 15).
-          } catch {
-            toast('Save request failed', 'danger');
-          } finally {
-            saveBtn!.disabled = false;
-          }
-        }
-
-        // --- `:::` admonition snippets (point 12) -----------------------
-        const KINDS = ['note', 'info', 'tip', 'warning', 'danger'];
-        function admonitionSource(context: CompletionContext) {
-          const token = context.matchBefore(/:{1,3}\w*/);
-          if (!token || (token.from === token.to && !context.explicit)) return null;
-          return {
-            from: token.from,
-            options: KINDS.map((k) =>
-              snippetCompletion(`:::${k}\n\${}\n:::\n`, {
-                label: `:::${k}`,
-                type: 'keyword',
-                detail: 'admonition',
-              }),
-            ),
-          };
-        }
-
-        const view = new EditorView({
-          parent: document.querySelector('#editor')!,
-          state: EditorState.create({
-            doc: srcEl.value,
-            extensions: [
-              basicSetup,
-              keymap.of([
-                indentWithTab,
-                {
-                  key: 'Mod-s',
-                  preventDefault: true,
-                  run: () => {
-                    void save();
-                    return true;
-                  },
-                },
-              ]),
-              markdown({ base: markdownLanguage, codeLanguages: languages }),
-              oneDark,
-              EditorView.lineWrapping,
-              autocompletion({ override: [admonitionSource] }),
-              EditorView.updateListener.of((u) => {
-                if (u.docChanged) {
-                  schedulePreview();
-                  refreshStatus();
-                }
-              }),
-            ],
-          }),
-        });
-
-        saveBtn.addEventListener('click', () => void save());
-
-        // --- preview toggle: split view <-> editor only -------------------
-        function setPreviewVisible(visible: boolean) {
-          previewVisible = visible;
-          main!.dataset.preview = visible ? 'on' : 'off';
-          toggleBtn!.setAttribute('aria-pressed', String(visible));
-          try {
-            localStorage.setItem('editor:preview', visible ? 'on' : 'off');
-          } catch {
-            /* private mode / storage disabled — the toggle still works in-session */
-          }
-          if (visible) runPreview(); // catch up on edits made while hidden
-        }
-        toggleBtn.addEventListener('click', () =>
-          setPreviewVisible(!previewVisible),
-        );
-
-        window.addEventListener('beforeunload', (e) => {
-          if (isDirty()) e.preventDefault();
+      if (app && srcEl) {
+        const slug = app.dataset.slug ?? '';
+        mountEditor(app, {
+          value: srcEl.value,
+          mode: 'split',
+          title: `${slug}.md`,
+          initialPreviewHtml:
+            document.querySelector<HTMLElement>('#initial-preview')?.innerHTML,
+          actions: [
+            { label: '← Back', href: `/tech-docs/${slug}` },
+            { label: 'View ↗', href: `/tech-docs/${slug}`, newTab: true },
+          ],
+          renderer: remoteRenderer('/api/preview'),
+          onSave: httpSave('/api/save', { extra: { slug } }),
         });
       }
     </script>
+
+    <style is:global>
+      .editor-error {
+        padding: 3rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      .editor-error a {
+        color: var(--accent);
+      }
+    </style>
   </body>
 </html>
