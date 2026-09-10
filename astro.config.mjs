@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
 import node from '@astrojs/node';
-import { remarkPlugins, rehypePlugins, shikiTheme } from './src/lib/markdown.ts';
+import { remarkPlugins, rehypePlugins, shikiTheme } from '@jecaro/md-editor/markdown';
 
 // Load DOCS_DIR from .env / .env.example and expose it on process.env so that
 // content.config.ts (which runs outside Vite's env handling) can read it.
@@ -20,8 +20,8 @@ export default defineConfig({
   // those routes 404, which is the intended read-only behaviour.
   output: 'static',
   adapter: node({ mode: 'standalone' }),
-  // The doc-rendering pipeline lives in src/lib/markdown.ts so the editor
-  // preview endpoint can reuse the exact same transforms and theme.
+  // The doc-rendering pipeline ships in @jecaro/md-editor/markdown so the editor
+  // preview endpoint reuses the exact same transforms and theme.
   markdown: {
     remarkPlugins,
     rehypePlugins,
