@@ -160,18 +160,31 @@ documento completo (definiciones de link `[a]: url`, numeración de listas).
 Mitigación: sólo se convierten en widget los bloques autocontenidos; el resto va
 por decoraciones de sintaxis.
 
-### Fase E4 — Release y consumo por tag
+### Fase E4 — Release y consumo por tag ✅
 
 README con la API, demo desplegable, `v0.1.0`. Aquí se sustituye el `npm link`
 por `"@…/md-editor": "github:…#v0.1.0"`, dejando documentado el flujo de link
 para iterar en local.
 
-### Fase E5 — Limpieza en `tech-docs`
+**Hecho:** `md-editor` tiene README con la API y el `playground/` standalone;
+tag `v0.1.0` publicado en `github.com/jecaro094/md-editor`. En `tech-docs`,
+`package.json` consume `github:jecaro094/md-editor#v0.1.0` y el flujo de `npm
+link` queda documentado en `CLAUDE.md`.
+
+### Fase E5 — Limpieza en `tech-docs` ✅
 
 Quitar de `package.json` las dependencias de CodeMirror/remark que ya aporta el
 paquete, actualizar `CLAUDE.md` (las secciones «Markdown pipeline» y «El editor»
 pasan a describir una dependencia), y revisar el chunk muerto de CodeMirror en
 la build.
+
+**Hecho:** `package.json` deja de listar `codemirror`, `@codemirror/*`,
+`@shikijs/rehype`, `rehype-stringify`, `remark-*` y `unified` (los aporta
+`@jecaro/md-editor`); quedan `astro`, `@astrojs/node`, `js-yaml` y
+`@types/js-yaml`. `CLAUDE.md` describe ahora la dependencia. El chunk del editor
+(`edit.astro_…`, ~650 kB) sigue emitiéndose en `npm run build`: Astro empaqueta
+el `<script>` de la página aunque la ruta haga 404 en producción; se deja como
+está porque ningún HTML servido lo referencia.
 
 ---
 
