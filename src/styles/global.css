@@ -1,85 +1,26 @@
+/*
+ * Site chrome specific to tech-docs. The shared dark theme (tokens, reset,
+ * ~17px scale, background blobs, `.expressive-code` frame) lives in
+ * `@jecaro/md-editor/styles/theme.css`, imported by `Layout.astro` before this
+ * file — this file only holds the font choice (Google Fonts, loaded in
+ * `Layout.astro`'s `<head>`) and page-level chrome the editor package doesn't
+ * know about: the header/nav, the footer, and the landing-page decorations.
+ */
 :root {
-  --bg: #0f1115;
-  --fg: #e4ece6;
-  --muted: #97a89d;
-  --accent: #3ddc84;
-  --accent-strong: #2bb673;
-  --lime: #cbe6a0;
-  --border: #262a33;
   --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono",
     Menlo, monospace;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-family: var(--font-sans);
 }
 
-h1,
-h2,
-h3,
-h4,
 .site-header .brand {
   font-family: var(--font-mono);
   letter-spacing: -0.01em;
 }
 
-html {
-  font-size: 106.25%; /* ~17px base; all rem sizes scale up a touch */
-  scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  background: var(--bg);
-  color: var(--fg);
-  line-height: 1.6;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-}
-
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(100px);
-  z-index: -1;
-  pointer-events: none;
-  will-change: transform;
-}
-
-body::before {
-  width: 42vw;
-  height: 42vw;
-  background: rgba(61, 220, 132, 0.16);
-  top: -12vw;
-  left: -12vw;
-  animation: drift-a 20s ease-in-out infinite;
-}
-
-body::after {
-  width: 36vw;
-  height: 36vw;
-  background: rgba(198, 255, 79, 0.12);
-  bottom: -12vw;
-  right: -10vw;
-  animation: drift-b 26s ease-in-out infinite;
-}
-
-@keyframes drift-a {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(12vw, 8vw) scale(1.15); }
-}
-
-@keyframes drift-b {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-10vw, -10vw) scale(1.1); }
 }
 
 @keyframes fade-in-up {
@@ -99,17 +40,7 @@ body::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before, body::after { animation: none; }
   .animate { animation: none; }
-}
-
-a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
 }
 
 .site-header {
@@ -172,83 +103,4 @@ main {
   border-top: 1px solid var(--border);
   color: var(--muted);
   font-size: 0.875rem;
-}
-
-/* Code block */
-.expressive-code {
-  margin: 1.5rem 0;
-  border-radius: 0.625rem;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--accent) 10%, var(--border));
-  background: color-mix(in srgb, var(--bg) 97%, var(--accent) 3%);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-.expressive-code .code-title-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.5rem 0.75rem 0.5rem 1rem;
-  background: color-mix(in srgb, var(--accent) 3.5%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 9%, var(--border));
-}
-
-.expressive-code .code-lang {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  color: var(--muted);
-  text-transform: lowercase;
-}
-
-.expressive-code .copy-btn {
-  font: inherit;
-  font-size: 0.95rem;
-  line-height: 1;
-  padding: 0.25rem 0.5rem;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-}
-
-.expressive-code .copy-btn:hover {
-  color: var(--fg);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.expressive-code .copy-btn.copied {
-  color: var(--lime);
-  border-color: rgba(198, 255, 79, 0.4);
-}
-
-.expressive-code :is(pre, .astro-code) {
-  margin: 0;
-  padding: 1rem 1.15rem;
-  overflow-x: auto;
-  font-family: var(--font-mono);
-  font-size: 14px; /* pinned; does not follow the global scale */
-  font-feature-settings: "liga" 0;
-  line-height: 1.65;
-  color: #d4d4d4; /* fallback for untokenised text, matches VS Code Dark Modern */
-  tab-size: 2;
-}
-
-.expressive-code .astro-code {
-  background: transparent !important;
-}
-
-.expressive-code code {
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
-  white-space: pre;
-  background: none;
-  border: 0;
-  padding: 0;
-  border-radius: 0;
 }
