@@ -4,11 +4,11 @@
   --muted: #97a89d;
   --accent: #3ddc84;
   --accent-strong: #2bb673;
-  --lime: #c6ff4f;
+  --lime: #cbe6a0;
   --border: #262a33;
   --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono",
     Menlo, monospace;
-  --font-sans: var(--font-mono);
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-family: var(--font-sans);
 }
 
@@ -51,6 +51,7 @@ body::after {
   filter: blur(100px);
   z-index: -1;
   pointer-events: none;
+  will-change: transform;
 }
 
 body::before {
@@ -122,6 +123,7 @@ a:hover {
   border-bottom: 1px solid var(--border);
   background: rgba(15, 17, 21, 0.7);
   backdrop-filter: blur(10px);
+  will-change: transform;
 }
 
 .site-header .brand {
@@ -174,21 +176,36 @@ main {
 
 /* Code block */
 .expressive-code {
-  position: relative;
   margin: 1.5rem 0;
-  border-radius: 0.5rem;
+  border-radius: 0.625rem;
   overflow: hidden;
-  border: 1px solid var(--border);
-  background: linear-gradient(145deg, #171b23, #12151b);
+  border: 1px solid color-mix(in srgb, var(--accent) 10%, var(--border));
+  background: color-mix(in srgb, var(--bg) 97%, var(--accent) 3%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.expressive-code .code-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem 0.5rem 1rem;
+  background: color-mix(in srgb, var(--accent) 3.5%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 9%, var(--border));
+}
+
+.expressive-code .code-lang {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-transform: lowercase;
 }
 
 .expressive-code .copy-btn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 2;
   font: inherit;
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1;
   padding: 0.25rem 0.5rem;
   color: var(--muted);
@@ -211,13 +228,14 @@ main {
 
 .expressive-code :is(pre, .astro-code) {
   margin: 0;
-  padding: 0.85rem 1rem;
+  padding: 1rem 1.15rem;
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 15px; /* pinned; does not follow the global scale */
-  line-height: 1.7;
+  font-size: 14px; /* pinned; does not follow the global scale */
+  font-feature-settings: "liga" 0;
+  line-height: 1.65;
   color: #d4d4d4; /* fallback for untokenised text, matches VS Code Dark Modern */
-  tab-size: 4;
+  tab-size: 2;
 }
 
 .expressive-code .astro-code {

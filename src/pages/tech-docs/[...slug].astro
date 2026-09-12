@@ -11,18 +11,53 @@ export async function getStaticPaths() {
 }
 
 const { doc } = Astro.props;
-const { Content } = await render(doc);
+const { Content, headings } = await render(doc);
 
 const title = doc.data.title ?? doc.id;
+
+// Nest each h3 under the h2 it follows, so the on-page index mirrors the
+// doc's actual section structure. h1s are skipped (a doc has exactly one,
+// the page title) and a stray h3 before any h2 is dropped rather than
+// mis-nested.
+const toc: { slug: string; text: string; children: { slug: string; text: string }[] }[] = [];
+for (const heading of headings) {
+  if (heading.depth === 2) {
+    toc.push({ slug: heading.slug, text: heading.text, children: [] });
+  } else if (heading.depth === 3 && toc.length > 0) {
+    toc[toc.length - 1].children.push({ slug: heading.slug, text: heading.text });
+  }
+}
 ---
 
 <Layout title={`${title} — Tech Docs`} description={doc.data.tagline} editSlug={doc.id}>
   <main>
     <article class="doc animate">
       <a class="doc-back" href="/">← All docs</a>
+      {toc.length > 0 && (
+        <nav class="toc" id="toc" aria-label="Table of contents">
+          <p class="toc-title">On this page</p>
+          <ul>
+            {toc.map((item) => (
+              <li>
+                <a href={`#${item.slug}`}>{item.text}</a>
+                {item.children.length > 0 && (
+                  <ul>
+                    {item.children.map((child) => (
+                      <li><a href={`#${child.slug}`}>{child.text}</a></li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
       <Content />
     </article>
   </main>
+  {toc.length > 0 && (
+    <a href="#toc" class="toc-jump" aria-label="Back to index">↑ Index</a>
+  )}
 </Layout>
 
 <script>
@@ -46,4 +81,17 @@ const title = doc.data.title ?? doc.id;
       }, 2000);
     });
   });
+
+  // Show the "back to index" button once the on-page index has scrolled out
+  // of view below the sticky header, so long docs still have a quick way
+  // back to it.
+  const tocNav = document.querySelector<HTMLElement>('.toc');
+  const tocJump = document.querySelector<HTMLElement>('.toc-jump');
+  if (tocNav && tocJump) {
+    const observer = new IntersectionObserver(
+      ([entry]) => tocJump.classList.toggle('is-visible', !entry.isIntersecting),
+      { rootMargin: '-64px 0px 0px 0px' },
+    );
+    observer.observe(tocNav);
+  }
 </script>

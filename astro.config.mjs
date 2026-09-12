@@ -27,4 +27,13 @@ export default defineConfig({
     rehypePlugins,
     shikiConfig: { theme: shikiTheme },
   },
+  // A `npm link`ed @jecaro/md-editor resolves through node_modules as a
+  // symlink; without this, Vite can resolve it to two different module
+  // identities (real path vs. symlink path) and duplicate the module.
+  // NOTE: this does NOT give live-reload across the symlink — Vite/chokidar
+  // does not reliably pick up changes written through it. After rebuilding
+  // md-editor you still need to restart `npm run dev` here. See CLAUDE.md.
+  vite: {
+    resolve: { preserveSymlinks: true },
+  },
 });
