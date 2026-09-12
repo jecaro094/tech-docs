@@ -66,6 +66,7 @@ body {
 
 .site-header .brand:hover {
   color: var(--accent);
+  text-decoration: none;
 }
 
 .site-header nav {
@@ -79,6 +80,7 @@ body {
 
 .site-header nav a:hover {
   color: var(--fg);
+  text-decoration: none;
 }
 
 /* Dev-only Edit link (added by Layout when running under `astro dev`). */
@@ -87,6 +89,7 @@ body {
 }
 .site-header nav a.edit-link:hover {
   color: var(--lime);
+  text-decoration: none;
 }
 
 main {

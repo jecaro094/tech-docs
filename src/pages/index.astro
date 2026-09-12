@@ -1,10 +1,32 @@
 ---
+import { relative, resolve } from 'node:path';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 
 const docs = (await getCollection('techDocs')).sort((a, b) =>
   (a.data.title ?? a.id).localeCompare(b.data.title ?? b.id),
 );
+
+const GENERAL_GROUP = 'General';
+
+// doc.id is lowercased by the glob loader's default slug; doc.filePath keeps
+// the on-disk casing but is relative to the project root, not DOCS_DIR. Resolve
+// it back to an absolute path and re-derive the path relative to DOCS_DIR so
+// the top-level folder name (e.g. "General") comes out with its real casing.
+const docsDir = process.env.DOCS_DIR!;
+const groups = new Map<string, typeof docs>();
+for (const doc of docs) {
+  const relPath = doc.filePath
+    ? relative(docsDir, resolve(process.cwd(), doc.filePath))
+    : doc.id;
+  const slashIndex = relPath.indexOf('/');
+  const group = slashIndex === -1 ? GENERAL_GROUP : relPath.slice(0, slashIndex);
+  const groupDocs = groups.get(group) ?? [];
+  groupDocs.push(doc);
+  groups.set(group, groupDocs);
+}
+
+const sortedGroups = [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
 ---
 
 <Layout
@@ -21,6 +43,20 @@ const docs = (await getCollection('techDocs')).sort((a, b) =>
       </p>
     </section>
 
+    {
+      docs.length > 0 && (
+        <div class="search-bar animate" style="animation-delay: 0.15s">
+          <input
+            type="search"
+            id="doc-search"
+            class="search-input"
+            placeholder="Filter docs by title..."
+            autocomplete="off"
+          />
+        </div>
+      )
+    }
+
     <section class="section animate" id="docs" style="animation-delay: 0.2s">
       <h2>Documentation</h2>
       {
@@ -30,16 +66,59 @@ const docs = (await getCollection('techDocs')).sort((a, b) =>
             file there and it shows up here.
           </p>
         ) : (
-          <div class="features-grid">
-            {docs.map((doc) => (
-              <a href={`/tech-docs/${doc.id}`} class="feature-card">
-                <h3>{doc.data.title ?? doc.id}</h3>
-                {doc.data.tagline && <p>{doc.data.tagline}</p>}
-              </a>
+          <>
+            <p class="subtitle" id="doc-search-empty" hidden>
+              No docs match your search.
+            </p>
+            {sortedGroups.map(([group, groupDocs]) => (
+              <div class="doc-group" data-doc-group>
+                <h3 class="doc-group-title">{group}</h3>
+                <div class="features-grid">
+                  {groupDocs.map((doc) => (
+                    <a
+                      href={`/tech-docs/${doc.id}`}
+                      class="feature-card"
+                      data-doc-title={(doc.data.title ?? doc.id).toLowerCase()}
+                    >
+                      <h3>{doc.data.title ?? doc.id}</h3>
+                      {doc.data.tagline && <p>{doc.data.tagline}</p>}
+                    </a>
+                  ))}
+                </div>
+              </div>
             ))}
-          </div>
+          </>
         )
       }
     </section>
   </main>
 </Layout>
+
+{
+  docs.length > 0 && (
+    <script>
+      const input = document.getElementById('doc-search') as HTMLInputElement;
+      const groups = document.querySelectorAll<HTMLElement>('[data-doc-group]');
+      const empty = document.getElementById('doc-search-empty');
+
+      input.addEventListener('input', () => {
+        const query = input.value.trim().toLowerCase();
+        let anyVisible = false;
+
+        for (const group of groups) {
+          let groupHasMatch = false;
+          const cards = group.querySelectorAll<HTMLElement>('[data-doc-title]');
+          for (const card of cards) {
+            const matches = card.dataset.docTitle!.includes(query);
+            card.hidden = !matches;
+            if (matches) groupHasMatch = true;
+          }
+          group.hidden = !groupHasMatch;
+          if (groupHasMatch) anyVisible = true;
+        }
+
+        if (empty) empty.hidden = anyVisible;
+      });
+    </script>
+  )
+}

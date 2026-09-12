@@ -31,10 +31,10 @@ for (const heading of headings) {
 
 <Layout title={`${title} — Tech Docs`} description={doc.data.tagline} editSlug={doc.id}>
   <main>
-    <article class="doc animate">
-      <a class="doc-back" href="/">← All docs</a>
+    <article class="doc">
+      <a class="doc-back animate" style="animation-delay: 0.1s" href="/">← All docs</a>
       {toc.length > 0 && (
-        <nav class="toc" id="toc" aria-label="Table of contents">
+        <nav class="toc animate" id="toc" style="animation-delay: 0.15s" aria-label="Table of contents">
           <p class="toc-title">On this page</p>
           <ul>
             {toc.map((item) => (
@@ -52,7 +52,9 @@ for (const heading of headings) {
           </ul>
         </nav>
       )}
-      <Content />
+      <div class="animate" style="animation-delay: 0.2s">
+        <Content />
+      </div>
     </article>
   </main>
   {toc.length > 0 && (
