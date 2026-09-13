@@ -16,6 +16,7 @@
 import type { APIRoute } from 'astro';
 import yaml from 'js-yaml';
 import { renderMarkdown, splitFrontmatter } from '@jecaro/md-editor/markdown';
+import { EDITOR_ENABLED } from '../../lib/editor-enabled';
 
 export const prerender = false;
 
@@ -27,7 +28,7 @@ function json(data: unknown, status = 200): Response {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!import.meta.env.DEV) return new Response('Not found', { status: 404 });
+  if (!EDITOR_ENABLED) return new Response('Not found', { status: 404 });
 
   let payload: { content?: unknown; blocks?: unknown };
   try {

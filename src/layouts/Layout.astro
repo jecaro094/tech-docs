@@ -5,6 +5,8 @@ import '../styles/project.css';
 import '../styles/landing.css';
 import '@jecaro/md-editor/styles/doc.css';
 import '../styles/content.css';
+import { EDITOR_ENABLED } from '../lib/editor-enabled';
+import { withBase } from '../lib/url';
 
 export interface Props {
   title: string;
@@ -14,7 +16,7 @@ export interface Props {
 }
 
 const { title, description = 'Landing page built with Astro', editSlug } = Astro.props;
-const showEdit = import.meta.env.DEV && Boolean(editSlug);
+const showEdit = EDITOR_ENABLED && Boolean(editSlug);
 const currentYear = new Date().getFullYear();
 ---
 
@@ -31,14 +33,14 @@ const currentYear = new Date().getFullYear();
       rel="stylesheet"
     />
     <title>{title}</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="/">Tech Docs</a>
+      <a class="brand" href={withBase()}>Tech Docs</a>
       <nav aria-label="Sections">
-        <a href="/#docs">All docs</a>
-        {showEdit && <a href={`/tech-docs/${editSlug}/edit`} class="edit-link">Edit</a>}
+        <a href={withBase('#docs')}>All docs</a>
+        {showEdit && <a href={withBase(`editor/${editSlug}`)} class="edit-link">Edit</a>}
       </nav>
     </header>
     <slot />

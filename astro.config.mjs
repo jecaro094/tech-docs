@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import { loadEnv } from 'vite';
 import node from '@astrojs/node';
 import { remarkPlugins, rehypePlugins, shikiTheme } from '@jecaro/md-editor/markdown';
@@ -13,13 +13,22 @@ if (DOCS_DIR) {
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://tech-docs.local',
+  site: 'https://jecaro094.github.io',
+  base: '/tech-docs',
   // Stay static by default: doc pages build to plain HTML. The Node adapter is
-  // only here so the editor's on-demand routes (`/api/*`, `.../edit`) can opt in
-  // with `export const prerender = false` during `astro dev`. On a static host
-  // those routes 404, which is the intended read-only behaviour.
+  // only here so the editor's on-demand routes (`/api/*`, `/editor/**`) can opt
+  // in with `export const prerender = false` during `astro dev`. On a static
+  // host those routes 404, which is the intended read-only behaviour.
   output: 'static',
   adapter: node({ mode: 'standalone' }),
+  // The editor switch. Unset it still turns on under `astro dev`; a build only
+  // exposes the editor when this is explicitly `true`. See
+  // src/lib/editor-enabled.ts.
+  env: {
+    schema: {
+      ENABLE_EDITOR: envField.boolean({ context: 'server', access: 'public', default: false }),
+    },
+  },
   // The doc-rendering pipeline ships in @jecaro/md-editor/markdown so the editor
   // preview endpoint reuses the exact same transforms and theme.
   markdown: {

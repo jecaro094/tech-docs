@@ -3,7 +3,8 @@
  *
  * `POST { slug: string, content: string }` → overwrites `<slug>.md` inside
  * `DOCS_DIR`. Guards, in order:
- *   - 403 unless running under `astro dev` (`import.meta.env.DEV`).
+ *   - 403 unless the editor is enabled (`EDITOR_ENABLED` — `astro dev`, or
+ *     `ENABLE_EDITOR=true` on a build).
  *   - slug resolved with `resolveDocPath` (rejects `..` / absolute / non-`.md`).
  *   - 404 if the target file does not already exist (editor only edits, never
  *     creates — matches the "create/delete by hand" decision in PLAN.md).
@@ -14,6 +15,7 @@ import fs from 'node:fs/promises';
 import yaml from 'js-yaml';
 import { splitFrontmatter } from '@jecaro/md-editor/markdown';
 import { resolveDocPath, DocPathError } from '../../lib/docs';
+import { EDITOR_ENABLED } from '../../lib/editor-enabled';
 
 export const prerender = false;
 
@@ -25,7 +27,7 @@ function json(data: unknown, status = 200): Response {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!import.meta.env.DEV) {
+  if (!EDITOR_ENABLED) {
     return json({ error: 'Editing is disabled on the published site' }, 403);
   }
 
