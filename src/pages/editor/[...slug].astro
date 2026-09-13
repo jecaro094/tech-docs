@@ -81,8 +81,8 @@ try {
     <script>
       import { mountEditor } from '@jecaro/md-editor';
       import { remoteRenderer, httpSave } from '@jecaro/md-editor/adapters/http';
+      import { withBase } from '../../lib/url';
 
-      const base = import.meta.env.BASE_URL;
       const app = document.querySelector<HTMLElement>('#app');
       const srcEl = document.querySelector<HTMLTextAreaElement>('#doc-src');
       if (app && srcEl) {
@@ -94,11 +94,11 @@ try {
           initialPreviewHtml:
             document.querySelector<HTMLElement>('#initial-preview')?.innerHTML,
           actions: [
-            { label: '← Back', href: `${base}${slug}` },
-            { label: 'View ↗', href: `${base}${slug}`, newTab: true },
+            { label: '← Back', href: withBase(slug) },
+            { label: 'View ↗', href: withBase(slug), newTab: true },
           ],
-          renderer: remoteRenderer(`${base}api/preview`),
-          onSave: httpSave(`${base}api/save`, { extra: { slug } }),
+          renderer: remoteRenderer(withBase('api/preview')),
+          onSave: httpSave(withBase('api/save'), { extra: { slug } }),
         });
       }
     </script>

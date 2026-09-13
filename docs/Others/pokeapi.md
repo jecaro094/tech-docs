@@ -11,7 +11,7 @@ infrastructure.
 
 ## Context
 
-![PokeAPI logo](/docs/PokeAPI.webp)
+![PokeAPI logo](/tech-docs/docs/PokeAPI.webp)
 
 This project is an API that pulls data from the public Pokémon REST API
 ([https://pokeapi.co](https://pokeapi.co)) to show different stats for your
