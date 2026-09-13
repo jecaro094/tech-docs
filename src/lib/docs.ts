@@ -1,10 +1,11 @@
 /**
  * Filesystem access to the external docs directory (`DOCS_DIR`).
  *
- * Only the dev-only editor endpoints (`/api/save`, `/tech-docs/<slug>/edit`) read
- * or write through here. `astro.config.mjs` copies `DOCS_DIR` onto `process.env`
- * before anything runs; `content.config.ts` throws if it is unset, so by the time
- * these helpers execute the value is guaranteed to exist.
+ * Only the editor endpoints (`/api/save`, `/editor/<slug>`), gated behind
+ * `EDITOR_ENABLED`, read or write through here. `astro.config.mjs` copies
+ * `DOCS_DIR` onto `process.env` before anything runs; `content.config.ts`
+ * throws if it is unset, so by the time these helpers execute the value is
+ * guaranteed to exist.
  */
 import path from 'node:path';
 

@@ -2,6 +2,7 @@
 import { relative, resolve } from 'node:path';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import { withBase } from '../lib/url';
 
 const docs = (await getCollection('techDocs')).sort((a, b) =>
   (a.data.title ?? a.id).localeCompare(b.data.title ?? b.id),
@@ -76,7 +77,7 @@ const sortedGroups = [...groups.entries()].sort(([a], [b]) => a.localeCompare(b)
                 <div class="features-grid">
                   {groupDocs.map((doc) => (
                     <a
-                      href={`/tech-docs/${doc.id}`}
+                      href={withBase(doc.id)}
                       class="feature-card"
                       data-doc-title={(doc.data.title ?? doc.id).toLowerCase()}
                     >

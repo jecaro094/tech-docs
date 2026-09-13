@@ -188,6 +188,23 @@ está porque ningún HTML servido lo referencia.
 
 ---
 
+## CI/CD y despliegue en GitHub Pages ✅
+
+Continuación tras las Fases E0–E5: despliegue en
+`https://jecaro094.github.io/tech-docs`, replicando el modelo de
+`Src/github/portfolio` (push a `main` → solo CI; tag `v*` → build + deploy +
+release). Plan detallado y decisiones en `PLAN-CI-CD.md`.
+
+**Hecho:** los `.md` pasan a commitearse en `docs/` (se abandona la premisa de
+"cero `.md` en el repo"); interruptor `ENABLE_EDITOR` (`src/lib/editor-enabled.ts`)
+sustituye los guardas `import.meta.env.DEV` sueltos del editor; `astro.config.mjs`
+añade `base: '/tech-docs'`; la ruta de doc se mueve a `src/pages/[...slug].astro`
+y la del editor a `src/pages/editor/[...slug].astro`; nuevo `src/lib/url.ts`
+(`withBase()`) para prefijar los enlaces escritos a mano; workflow
+`.github/workflows/deploy.yml`.
+
+---
+
 ## Cuestiones abiertas menores
 
 1. **Nombre y scope del paquete** — se asume `@jecaro/md-editor` en un repo

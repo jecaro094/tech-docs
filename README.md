@@ -1,11 +1,11 @@
 # Tech Docs
 
-A 100% local Markdown documentation viewer and editor built on Astro 5.
+A Markdown documentation viewer and editor built on Astro 5, published at
+**https://jecaro094.github.io/tech-docs**.
 
-Your `.md` files live in a directory **outside this repo**. This repo is only the
-rendering and editing technology — zero docs are committed here. Run it with
-`npm run dev` and you get a dark-themed doc site with a live editor; run
-`npm run build` and you get a read-only static site.
+The `.md` files live under `docs/` in this repo. Run it with `npm run dev` and
+you get a dark-themed doc site with a live editor; run `npm run build` and you
+get a read-only static site — that's what gets deployed.
 
 ## Quick start
 
@@ -13,18 +13,12 @@ rendering and editing technology — zero docs are committed here. Run it with
 git clone <this repo>
 cd tech-docs
 npm install
-cp .env.example .env          # then edit .env
-npm run dev                   # http://localhost:4321
+cp .env.example .env          # DOCS_DIR=./docs works out of the box
+npm run dev                   # http://localhost:4321/tech-docs
 ```
 
-Set `DOCS_DIR` in `.env` to the **absolute path** of the folder that holds your
-Markdown:
-
-```sh
-DOCS_DIR=/Users/you/notes/tech-docs-content
-```
-
-There is no fallback — `content.config.ts` throws if `DOCS_DIR` is unset or
+`DOCS_DIR` in `.env` points at the folder that holds the Markdown (`./docs` by
+default). There is no fallback — `content.config.ts` throws if it is unset or
 empty. Drop a `.md` file into that folder and it appears on the index with no
 code change; the file name (minus `.md`) is its URL slug.
 
@@ -43,8 +37,23 @@ writes the file straight to `DOCS_DIR`:
 - Creating and deleting docs is done by hand in `DOCS_DIR` — the editor only
   edits existing files.
 
-The editor and its endpoints (`/api/preview`, `/api/save`, `.../edit`) are
-**dev-only**. In a production build they return 404/403.
+The editor and its endpoints (`/editor/**`, `/api/preview`, `/api/save`) are
+gated behind `ENABLE_EDITOR` (see `.env.example`): on under `npm run dev` with
+no configuration, off (404/403) on any other build — including the one that
+gets deployed to GitHub Pages.
+
+## Deploying
+
+Pushing to `main` runs CI only (a plain `npm run build`, nothing published).
+Pushing a `v*` tag builds and publishes to GitHub Pages, then cuts a GitHub
+Release:
+
+```sh
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+See `.github/workflows/deploy.yml` and `PLAN-CI-CD.md` for the full pipeline.
 
 ## Doc format
 
@@ -71,9 +80,8 @@ Anything else in the frontmatter is passed through untouched.
 
 ## Images
 
-Referenced by absolute URL and served from `public/docs/`, e.g.
-`![logo](/docs/thing.webp)`. Doc images are committed with this repo;
-`DOCS_DIR` holds Markdown only.
+Referenced by absolute URL, prefixed with the site's base path, and served
+from `public/docs/`, e.g. `![logo](/tech-docs/docs/thing.webp)`.
 
 ## Commands
 

@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../layouts/Layout.astro';
+import { withBase } from '../lib/url';
 
 export async function getStaticPaths() {
   const docs = await getCollection('techDocs');
@@ -32,7 +33,7 @@ for (const heading of headings) {
 <Layout title={`${title} — Tech Docs`} description={doc.data.tagline} editSlug={doc.id}>
   <main>
     <article class="doc">
-      <a class="doc-back animate" style="animation-delay: 0.1s" href="/">← All docs</a>
+      <a class="doc-back animate" style="animation-delay: 0.1s" href={withBase()}>← All docs</a>
       {toc.length > 0 && (
         <nav class="toc animate" id="toc" style="animation-delay: 0.15s" aria-label="Table of contents">
           <p class="toc-title">On this page</p>

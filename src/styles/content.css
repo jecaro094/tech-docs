@@ -7,7 +7,7 @@
  * preview). What stays here is only chrome that belongs to this site.
  */
 
-/* "← All docs" link above a doc (src/pages/tech-docs/[...slug].astro) */
+/* "← All docs" link above a doc (src/pages/[...slug].astro) */
 .doc-back {
   display: inline-block;
   margin-bottom: 2rem;
@@ -20,7 +20,7 @@
   text-decoration: none;
 }
 
-/* On-page index (src/pages/tech-docs/[...slug].astro), built from the
+/* On-page index (src/pages/[...slug].astro), built from the
  * headings Astro extracts while rendering the doc's Markdown body. */
 .toc {
   margin: 0 0 2.5rem;
