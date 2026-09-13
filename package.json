@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^9.5.5",
-    "@jecaro/md-editor": "github:jecaro094/md-editor#v0.3.0",
+    "@jecaro/md-editor": "github:jecaro094/md-editor#v0.4.0",
     "@types/js-yaml": "^4.0.9",
     "astro": "^5.0.0",
     "js-yaml": "^4.3.2"

@@ -10,7 +10,7 @@ this repo (`DOCS_DIR=./docs`). The Markdown pipeline and the editor itself were
 extracted to the standalone package
 **[`@jecaro/md-editor`](https://github.com/jecaro094/md-editor)** and are
 consumed here as a git dependency pinned to a tag
-(`github:jecaro094/md-editor#v0.3.0` in `package.json`). See `PLAN.md` for the
+(`github:jecaro094/md-editor#v0.4.0` in `package.json`). See `PLAN.md` for the
 viewer/editor roadmap (Fases 0–3) and the extraction roadmap (Fases E0–E5), both
 implemented, and `PLAN-CI-CD.md` for the GitHub Pages deployment.
 
