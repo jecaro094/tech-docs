@@ -33,7 +33,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(90deg, var(--accent) 10%, var(--lime) 90%);
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-strong) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -88,7 +88,7 @@ body {
   color: var(--accent);
 }
 .site-header nav a.edit-link:hover {
-  color: var(--lime);
+  color: var(--accent-strong);
   text-decoration: none;
 }
 

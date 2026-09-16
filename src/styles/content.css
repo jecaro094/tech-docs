@@ -23,19 +23,19 @@
 /* On-page index (src/pages/[...slug].astro), built from the
  * headings Astro extracts while rendering the doc's Markdown body. */
 .toc {
-  margin: 0 0 2.5rem;
-  padding: 1rem 1.25rem;
+  margin: 0 0 3rem;
+  padding: 1.25rem 1.5rem;
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 8px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
   background: color-mix(in srgb, var(--accent) 5%, var(--bg));
 }
 .toc-title {
-  margin: 0 0 0.6rem;
+  margin: 0 0 0.75rem;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
 }
@@ -45,21 +45,22 @@
   padding: 0;
 }
 .toc li {
-  margin: 0.35rem 0;
+  margin: 0.4rem 0;
 }
 .toc li > ul {
-  margin: 0.35rem 0 0.35rem 1.1rem;
-  padding-left: 0.75rem;
-  border-left: 1px solid var(--border);
+  margin: 0.4rem 0 0.4rem 1.25rem;
+  padding-left: 0.85rem;
+  border-left: 2px solid color-mix(in srgb, var(--accent) 30%, var(--border));
 }
 .toc a {
   font-size: 0.95rem;
   color: var(--muted);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 .toc a:hover {
   color: var(--accent);
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 /* Floating "back to index" button, toggled via IntersectionObserver in

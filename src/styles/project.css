@@ -22,12 +22,12 @@
 
 /* Inline code outside a rendered doc (e.g. the empty-state hint on the index) */
 code {
-  background: rgba(61, 220, 132, 0.12);
-  border: 1px solid rgba(61, 220, 132, 0.3);
+  background: rgba(123, 184, 255, 0.12);
+  border: 1px solid rgba(123, 184, 255, 0.25);
   border-radius: 6px;
   padding: 0.15rem 0.45rem;
   font-size: 0.9em;
   font-family: var(--font-mono);
-  color: var(--lime);
+  color: var(--accent);
   white-space: nowrap;
 }
