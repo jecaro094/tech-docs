@@ -1,0 +1,123 @@
+/*
+ * Sidebar navigation — left panel with hierarchical doc tree.
+ * Collapsible groups, active-page highlight, responsive drawer on mobile.
+ */
+
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  height: calc(100vh - 53px);
+  position: sticky;
+  top: 53px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+  padding: 2rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.sidebar-root {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Group --- */
+.sidebar-group {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 1.25rem;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.sidebar-group-toggle:hover {
+  color: var(--fg);
+}
+
+.sidebar-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-group.is-open > .sidebar-group-toggle .sidebar-chevron {
+  transform: rotate(90deg);
+}
+
+/* --- Items list --- */
+.sidebar-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: none;
+}
+
+.sidebar-group.is-open > .sidebar-items,
+.sidebar-group.is-active > .sidebar-items {
+  display: block;
+}
+
+.sidebar-items li a {
+  display: block;
+  padding: 0.35rem 1.25rem 0.35rem 2rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.sidebar-items li a:hover {
+  color: var(--fg);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.sidebar-items li.is-active a {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  font-weight: 500;
+}
+
+/* --- Mobile --- */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 53px;
+    left: 0;
+    z-index: 45;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: none;
+    background: var(--bg);
+  }
+  .sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  }
+}

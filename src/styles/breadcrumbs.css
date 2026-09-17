@@ -1,0 +1,45 @@
+/*
+ * Breadcrumbs — path indicator above doc content.
+ */
+
+.breadcrumbs {
+  margin-bottom: 1rem;
+}
+
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}
+
+.breadcrumbs li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.breadcrumbs a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.breadcrumbs a:hover {
+  color: var(--accent);
+}
+
+.breadcrumbs span[aria-current="page"] {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.breadcrumbs-sep {
+  color: var(--muted);
+  opacity: 0.5;
+}

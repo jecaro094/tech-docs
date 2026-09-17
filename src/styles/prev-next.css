@@ -1,0 +1,53 @@
+/*
+ * Prev/Next navigation — bottom-of-page doc links.
+ */
+
+.prev-next {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.prev-next-link {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prev-next-link:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(123, 184, 255, 0.1);
+}
+
+.prev-next-next {
+  text-align: right;
+}
+
+.prev-next-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.prev-next-title {
+  font-size: 0.95rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .prev-next {
+    grid-template-columns: 1fr;
+  }
+}

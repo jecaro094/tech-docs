@@ -6,23 +6,46 @@
  * `Layout.astro`'s `<head>`) and page-level chrome the editor package doesn't
  * know about: the header/nav, the footer, and the landing-page decorations.
  */
+
+/* === Theme tokens (dark default, light override) === */
 :root {
   --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono",
     Menlo, monospace;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Dark theme (default) */
+  --bg: #0f1115;
+  --bg-raised: #171b23;
+  --fg: #e1e4e8;
+  --muted: #8b949e;
+  --accent: #7bb8ff;
+  --accent-strong: #a8d0ff;
+  --border: #21262d;
 }
 
-.site-header .brand {
-  font-family: var(--font-mono);
-  letter-spacing: -0.01em;
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-raised: #f6f8fa;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --accent: #0969da;
+  --accent-strong: #0550ae;
+  --border: #d0d7de;
 }
 
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #ffffff;
+    --bg-raised: #f6f8fa;
+    --fg: #1f2328;
+    --muted: #656d76;
+    --accent: #0969da;
+    --accent-strong: #0550ae;
+    --border: #d0d7de;
+  }
 }
 
+/* === Animations === */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
@@ -43,6 +66,14 @@ body {
   .animate { animation: none; }
 }
 
+/* === Body === */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Header === */
 .site-header {
   position: sticky;
   top: 0;
@@ -50,14 +81,22 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0 1.5rem;
+  height: 53px;
   border-bottom: 1px solid var(--border);
-  background: rgba(15, 17, 21, 0.7);
-  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(12px);
   will-change: transform;
 }
 
+.site-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .site-header .brand {
+  font-family: var(--font-mono);
   font-weight: 700;
   font-size: 1.05rem;
   letter-spacing: 0.02em;
@@ -69,27 +108,106 @@ body {
   text-decoration: none;
 }
 
+.sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  color: var(--fg);
+  border-color: var(--muted);
+}
+
+@media (max-width: 1024px) {
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
 .site-header nav {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .site-header nav a {
   color: var(--muted);
+  font-size: 0.875rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
 .site-header nav a:hover {
   color: var(--fg);
   text-decoration: none;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-/* Dev-only Edit link (added by Layout when running under `astro dev`). */
+/* Dev-only Edit link */
 .site-header nav a.edit-link {
   color: var(--accent);
 }
 .site-header nav a.edit-link:hover {
   color: var(--accent-strong);
   text-decoration: none;
+}
+
+/* === Layout shell === */
+.doc-layout {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.doc-content {
+  flex: 1 1 0%;
+  min-width: 0;
+  padding: 2rem 1rem;
+}
+
+/* Override doc.css: text fills the full central column */
+.doc-content .doc {
+  max-width: none;
+  width: 100%;
+}
+.doc-content .doc h1 {
+  font-size: 2.1rem;
+  margin-bottom: 1rem;
+}
+.doc-content .doc h2 {
+  font-size: 1.4rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+.doc-content .doc h3 {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.doc-content .doc h4 {
+  font-size: 1.05rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.6rem;
+}
+.doc-content .doc p,
+.doc-content .doc li {
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* Index page without sidebar */
+.index-layout {
+  flex: 1;
 }
 
 main {
@@ -100,6 +218,7 @@ main {
   width: 100%;
 }
 
+/* === Footer === */
 .site-footer {
   text-align: center;
   padding: 1.5rem;

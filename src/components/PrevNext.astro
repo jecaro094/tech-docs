@@ -1,0 +1,27 @@
+---
+import { withBase } from '../lib/url';
+
+interface Props {
+  prev: { slug: string; label: string } | null;
+  next: { slug: string; label: string } | null;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{(prev || next) && (
+  <nav class="prev-next" aria-label="Document navigation">
+    {prev ? (
+      <a class="prev-next-link prev-next-prev" href={withBase(prev.slug)}>
+        <span class="prev-next-label">Previous</span>
+        <span class="prev-next-title">{prev.label}</span>
+      </a>
+    ) : <span />}
+    {next ? (
+      <a class="prev-next-link prev-next-next" href={withBase(next.slug)}>
+        <span class="prev-next-label">Next</span>
+        <span class="prev-next-title">{next.label}</span>
+      </a>
+    ) : <span />}
+  </nav>
+)}

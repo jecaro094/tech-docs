@@ -1,0 +1,47 @@
+/*
+ * Print button — small icon button in the top navbar.
+ */
+
+.print-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.print-btn:hover {
+  color: var(--fg);
+  border-color: var(--muted);
+}
+
+@media print {
+  .sidebar,
+  .right-toc,
+  .site-header,
+  .site-footer,
+  .prev-next,
+  .doc-back,
+  .print-btn,
+  .breadcrumbs,
+  #sidebar-toggle {
+    display: none !important;
+  }
+
+  .doc-layout {
+    display: block !important;
+  }
+
+  .doc-content {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}

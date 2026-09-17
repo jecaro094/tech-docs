@@ -2,6 +2,9 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import { withBase } from '../lib/url';
+import { buildSidebarTree, flattenSlugs } from '../lib/sidebar';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PrevNext from '../components/PrevNext.astro';
 
 export async function getStaticPaths() {
   const docs = await getCollection('techDocs');
@@ -16,10 +19,31 @@ const { Content, headings } = await render(doc);
 
 const title = doc.data.title ?? doc.id;
 
-// Nest each h3 under the h2 it follows, so the on-page index mirrors the
-// doc's actual section structure. h1s are skipped (a doc has exactly one,
-// the page title) and a stray h3 before any h2 is dropped rather than
-// mis-nested.
+// Build sidebar tree
+const allDocs = await getCollection('techDocs');
+const sidebarTree = buildSidebarTree(allDocs);
+const flatSlugs = flattenSlugs(sidebarTree);
+
+// Prev/Next
+const currentIndex = flatSlugs.indexOf(doc.id);
+const prev = currentIndex > 0
+  ? { slug: flatSlugs[currentIndex - 1], label: allDocs.find((d) => d.id === flatSlugs[currentIndex - 1])?.data.title ?? flatSlugs[currentIndex - 1] }
+  : null;
+const next = currentIndex < flatSlugs.length - 1
+  ? { slug: flatSlugs[currentIndex + 1], label: allDocs.find((d) => d.id === flatSlugs[currentIndex + 1])?.data.title ?? flatSlugs[currentIndex + 1] }
+  : null;
+
+// Breadcrumbs
+const parts = doc.id.split('/');
+const crumbs = [
+  { label: 'Docs', href: withBase() },
+  ...parts.map((part, i) => ({
+    label: (allDocs.find((d) => d.id === parts.slice(0, i + 1).join('/'))?.data.title ?? part).replace(/-/g, ' '),
+    href: i < parts.length - 1 ? withBase(parts.slice(0, i + 1).join('/')) : undefined,
+  })),
+];
+
+// Right TOC
 const toc: { slug: string; text: string; children: { slug: string; text: string }[] }[] = [];
 for (const heading of headings) {
   if (heading.depth === 2) {
@@ -30,37 +54,22 @@ for (const heading of headings) {
 }
 ---
 
-<Layout title={`${title} — Tech Docs`} description={doc.data.tagline} editSlug={doc.id}>
-  <main>
-    <article class="doc">
-      <a class="doc-back animate" style="animation-delay: 0.1s" href={withBase()}>← All docs</a>
-      {toc.length > 0 && (
-        <nav class="toc animate" id="toc" style="animation-delay: 0.15s" aria-label="Table of contents">
-          <p class="toc-title">On this page</p>
-          <ul>
-            {toc.map((item) => (
-              <li>
-                <a href={`#${item.slug}`}>{item.text}</a>
-                {item.children.length > 0 && (
-                  <ul>
-                    {item.children.map((child) => (
-                      <li><a href={`#${child.slug}`}>{child.text}</a></li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
-      <div class="animate" style="animation-delay: 0.2s">
-        <Content />
-      </div>
-    </article>
-  </main>
-  {toc.length > 0 && (
-    <a href="#toc" class="toc-jump" aria-label="Back to index">↑ Index</a>
-  )}
+<Layout
+  title={`${title} — Tech Docs`}
+  description={doc.data.tagline}
+  editSlug={doc.id}
+  sidebarTree={sidebarTree}
+  activeSlug={doc.id}
+  tocItems={toc}
+>
+  <Breadcrumbs crumbs={crumbs} />
+  <article class="doc">
+    <a class="doc-back animate" style="animation-delay: 0.1s" href={withBase()}>← All docs</a>
+    <div class="animate" style="animation-delay: 0.15s">
+      <Content />
+    </div>
+  </article>
+  <PrevNext prev={prev} next={next} />
 </Layout>
 
 <script>
@@ -84,17 +93,4 @@ for (const heading of headings) {
       }, 2000);
     });
   });
-
-  // Show the "back to index" button once the on-page index has scrolled out
-  // of view below the sticky header, so long docs still have a quick way
-  // back to it.
-  const tocNav = document.querySelector<HTMLElement>('.toc');
-  const tocJump = document.querySelector<HTMLElement>('.toc-jump');
-  if (tocNav && tocJump) {
-    const observer = new IntersectionObserver(
-      ([entry]) => tocJump.classList.toggle('is-visible', !entry.isIntersecting),
-      { rootMargin: '-64px 0px 0px 0px' },
-    );
-    observer.observe(tocNav);
-  }
 </script>

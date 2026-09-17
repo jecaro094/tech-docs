@@ -1,0 +1,64 @@
+---
+interface TocItem {
+  slug: string;
+  text: string;
+  children: { slug: string; text: string }[];
+}
+
+interface Props {
+  items: TocItem[];
+}
+
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <aside class="right-toc" id="right-toc">
+    <p class="right-toc-title">On this page</p>
+    <ul>
+      {items.map((item) => (
+        <li>
+          <a href={`#${item.slug}`} data-toc-link>{item.text}</a>
+          {item.children.length > 0 && (
+            <ul>
+              {item.children.map((child) => (
+                <li><a href={`#${child.slug}`} data-toc-link>{child.text}</a></li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  </aside>
+)}
+
+<script>
+  // Scroll-spy: highlight the current heading in the right TOC
+  const tocLinks = document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
+  if (tocLinks.length > 0) {
+    const headings: Element[] = [];
+    tocLinks.forEach((link) => {
+      const id = link.getAttribute('href')?.slice(1);
+      if (id) {
+        const el = document.getElementById(id);
+        if (el) headings.push(el);
+      }
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            tocLinks.forEach((link) => {
+              link.classList.toggle('is-active', link.getAttribute('href') === `#${id}`);
+            });
+          }
+        }
+      },
+      { rootMargin: '-80px 0px -70% 0px', threshold: 0 },
+    );
+
+    headings.forEach((h) => observer.observe(h));
+  }
+</script>

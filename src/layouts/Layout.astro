@@ -1,23 +1,55 @@
 ---
 import '@jecaro/md-editor/styles/theme.css';
+import '@jecaro/md-editor/styles/doc.css';
 import '../styles/global.css';
 import '../styles/project.css';
 import '../styles/landing.css';
-import '@jecaro/md-editor/styles/doc.css';
 import '../styles/content.css';
+import '../styles/sidebar.css';
+import '../styles/breadcrumbs.css';
+import '../styles/right-toc.css';
+import '../styles/theme-toggle.css';
+import '../styles/prev-next.css';
+import '../styles/print.css';
 import { EDITOR_ENABLED } from '../lib/editor-enabled';
 import { withBase } from '../lib/url';
+import type { SidebarItem } from '../lib/sidebar';
+import Sidebar from '../components/Sidebar.astro';
+import RightTOC from '../components/RightTOC.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import PrintButton from '../components/PrintButton.astro';
+
+interface TocItem {
+  slug: string;
+  text: string;
+  children: { slug: string; text: string }[];
+}
 
 export interface Props {
   title: string;
   description?: string;
   /** Doc id. When set (and running under `astro dev`) the header shows an Edit link. */
   editSlug?: string;
+  /** Sidebar tree data — when provided, renders the sidebar layout. */
+  sidebarTree?: SidebarItem[];
+  /** Currently active doc slug — highlights the item in the sidebar. */
+  activeSlug?: string;
+  /** Right-side TOC items — when provided, renders the right TOC panel. */
+  tocItems?: TocItem[];
 }
 
-const { title, description = 'Landing page built with Astro', editSlug } = Astro.props;
+const {
+  title,
+  description = 'Landing page built with Astro',
+  editSlug,
+  sidebarTree,
+  activeSlug,
+  tocItems,
+} = Astro.props;
+
 const showEdit = EDITOR_ENABLED && Boolean(editSlug);
 const currentYear = new Date().getFullYear();
+const hasSidebar = Boolean(sidebarTree && sidebarTree.length > 0);
 ---
 
 <!doctype html>
@@ -34,16 +66,52 @@ const currentYear = new Date().getFullYear();
     />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    <script is:inline>
+      // Apply stored theme before paint to avoid flash
+      (function() {
+        var t = localStorage.getItem('theme-preference') || 'dark';
+        if (t !== 'auto') document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href={withBase()}>Tech Docs</a>
+      <div class="site-header-left">
+        {hasSidebar && (
+          <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Toggle sidebar" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        )}
+        <a class="brand" href={withBase()}>Tech Docs</a>
+      </div>
       <nav aria-label="Sections">
-        <a href={withBase('#docs')}>All docs</a>
+        <a href={withBase()}>Docs</a>
         {showEdit && <a href={withBase(`editor/${editSlug}`)} class="edit-link">Edit</a>}
+        <PrintButton />
+        <ThemeToggle />
       </nav>
     </header>
-    <slot />
+
+    {hasSidebar ? (
+      <div class="doc-layout">
+        <Sidebar tree={sidebarTree!} activeSlug={activeSlug} />
+        <div class="doc-content">
+          <slot />
+        </div>
+        {tocItems && tocItems.length > 0 && (
+          <RightTOC items={tocItems} />
+        )}
+      </div>
+    ) : (
+      <div class="index-layout">
+        <slot />
+      </div>
+    )}
+
     <footer class="site-footer">
       <p>&copy; {currentYear} Tech Docs</p>
     </footer>
