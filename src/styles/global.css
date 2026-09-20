@@ -45,6 +45,33 @@
   }
 }
 
+/*
+ * `.expressive-code` (the fenced-code frame, `@jecaro/md-editor/styles/theme.css`)
+ * is pinned to fixed dark colours so the single dark Shiki theme stays legible
+ * regardless of the site theme (see that file's comment). On a white page that
+ * reads as a near-black block with too much contrast against `--bg`, so light
+ * mode gets its own lighter, blue-leaning slate here instead of the pinned
+ * near-black — still dark enough for the light-on-dark token colours (the
+ * dimmest token, comments at `#6A9955`, keeps ~4.3:1 against it), just closer
+ * in lightness to the white page.
+ */
+[data-theme="light"] .expressive-code {
+  border-color: color-mix(in srgb, #7bb8ff 16%, #454b54);
+  background: color-mix(in srgb, #262b33 94%, #7bb8ff 6%);
+}
+[data-theme="light"] .expressive-code .code-title-bar {
+  border-bottom-color: color-mix(in srgb, #7bb8ff 14%, #454b54);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .expressive-code {
+    border-color: color-mix(in srgb, #7bb8ff 16%, #454b54);
+    background: color-mix(in srgb, #262b33 94%, #7bb8ff 6%);
+  }
+  :root:not([data-theme]) .expressive-code .code-title-bar {
+    border-bottom-color: color-mix(in srgb, #7bb8ff 14%, #454b54);
+  }
+}
+
 /* === Animations === */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(16px); }
