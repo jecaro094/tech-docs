@@ -65,6 +65,7 @@
       localStorage.setItem(STORAGE_KEY, next);
       applyTheme(next);
       updateIcon(next);
+      document.dispatchEvent(new CustomEvent('themechange', { detail: { theme: next } }));
     });
   });
 </script>

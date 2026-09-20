@@ -94,6 +94,65 @@ for (const heading of headings) {
     });
   });
 
+  // Mermaid diagrams — client-side rendering, themed from the site's own
+  // CSS custom properties (see src/lib/mermaid-theme.ts) instead of
+  // Mermaid's generic built-in 'dark'/'default' themes, so diagrams match
+  // the page's palette in both light and dark mode.
+  {
+    const initialContainers = document.querySelectorAll<HTMLElement>('.mermaid');
+    if (initialContainers.length > 0) {
+      const [mermaid, { buildMermaidThemeVariables }] = await Promise.all([
+        import('mermaid').then((m) => m.default),
+        import('../lib/mermaid-theme'),
+      ]);
+
+      // Store original definitions on first load
+      const definitions = new Map<HTMLElement, string>();
+      initialContainers.forEach((div) => {
+        definitions.set(div, div.textContent ?? '');
+      });
+
+      let renderId = 0;
+
+      async function renderDiagrams() {
+        renderId++;
+
+        // Re-query current .mermaid nodes each time (may have been replaced)
+        const current = document.querySelectorAll<HTMLElement>('.mermaid');
+
+        // Replace each container with a fresh div (avoids stale SVG/ID conflicts)
+        current.forEach((oldDiv) => {
+          const def = definitions.get(oldDiv) ?? oldDiv.textContent ?? '';
+          const fresh = document.createElement('div');
+          fresh.className = 'mermaid';
+          fresh.textContent = def;
+          oldDiv.replaceWith(fresh);
+          // Track the new node with the same definition
+          definitions.set(fresh, def);
+        });
+
+        // Re-query the fresh nodes
+        const freshNodes = document.querySelectorAll<HTMLElement>('.mermaid');
+
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          themeVariables: buildMermaidThemeVariables(),
+          securityLevel: 'loose',
+          generateId: true,
+          mermaid: { id: `mermaid-${renderId}` },
+        });
+
+        await mermaid.run({ nodes: freshNodes });
+      }
+
+      await renderDiagrams();
+
+      // Re-render on theme change
+      document.addEventListener('themechange', () => renderDiagrams());
+    }
+  }
+
   // Image lightbox — only wire if there are zoomable images
   {
     const images = Array.from(document.querySelectorAll<HTMLImageElement>('.doc-zoom img'));

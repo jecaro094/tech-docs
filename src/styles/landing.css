@@ -52,7 +52,7 @@
 .search-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(123, 184, 255, 0.18);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 /* Doc groups */
@@ -85,15 +85,10 @@
 }
 
 .feature-card:hover {
-  border-color: rgba(123, 184, 255, 0.5);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(123, 184, 255, 0.12);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 12%, transparent);
   text-decoration: none;
-}
-
-.feature-card .icon {
-  font-size: 1.8rem;
-  margin-bottom: 0.75rem;
 }
 
 .feature-card h3 {

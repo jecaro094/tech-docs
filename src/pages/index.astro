@@ -13,16 +13,16 @@ const sidebarTree = buildSidebarTree(docs);
 
 <Layout
   title="Tech Docs"
-  description="Technical documentation for my projects"
+  description="Write-ups on the technologies I use, the projects I've built, and the systems and designs I've learned along the way."
   sidebarTree={sidebarTree}
 >
   <main>
     <section class="hero animate" style="animation-delay: 0.1s">
       <h1 class="gradient-text">Tech Docs</h1>
-      <p class="tagline">Technical documentation for my projects</p>
+      <p class="tagline">A technical portfolio.</p>
       <p class="subtitle">
-        A collection of technical documentation showcasing architecture
-        decisions, code examples, and deployment strategies.
+        Write-ups on the technologies I use, the projects I've built, and the
+        systems and designs I've learned along the way.
       </p>
     </section>
 
@@ -34,6 +34,7 @@ const sidebarTree = buildSidebarTree(docs);
             id="doc-search"
             class="search-input"
             placeholder="Filter docs by title..."
+            aria-label="Filter docs by title"
             autocomplete="off"
           />
         </div>
@@ -50,7 +51,7 @@ const sidebarTree = buildSidebarTree(docs);
           </p>
         ) : (
           <>
-            <p class="subtitle" id="doc-search-empty" hidden>
+            <p class="subtitle" id="doc-search-empty" hidden aria-live="polite">
               No docs match your search.
             </p>
             {sidebarTree.map((group) => (
@@ -64,6 +65,7 @@ const sidebarTree = buildSidebarTree(docs);
                       data-doc-title={item.label.toLowerCase()}
                     >
                       <h3>{item.label}</h3>
+                      {item.description && <p>{item.description}</p>}
                     </a>
                   ))}
                 </div>

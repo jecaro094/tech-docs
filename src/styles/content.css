@@ -19,3 +19,24 @@
   color: var(--accent);
   text-decoration: none;
 }
+
+/*
+ * Mermaid diagrams — framed like a code block (see @jecaro/md-editor's
+ * .expressive-code) so they read as a content "card" consistent with the
+ * rest of the doc, instead of floating bare over the page background.
+ */
+.mermaid {
+  display: flex;
+  justify-content: center;
+  margin: 1.75rem 0;
+  padding: 1.25rem 1rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
+  background: color-mix(in srgb, var(--bg-raised) 97%, var(--accent) 3%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  overflow-x: auto;
+}
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}

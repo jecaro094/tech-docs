@@ -3,6 +3,7 @@ import { defineConfig, envField } from 'astro/config';
 import { loadEnv } from 'vite';
 import node from '@astrojs/node';
 import { remarkPlugins, rehypePlugins, shikiTheme } from '@jecaro/md-editor/markdown';
+import { remarkMermaid } from './src/lib/remark-mermaid';
 
 // Load DOCS_DIR from .env / .env.example and expose it on process.env so that
 // content.config.ts (which runs outside Vite's env handling) can read it.
@@ -32,7 +33,7 @@ export default defineConfig({
   // The doc-rendering pipeline ships in @jecaro/md-editor/markdown so the editor
   // preview endpoint reuses the exact same transforms and theme.
   markdown: {
-    remarkPlugins,
+    remarkPlugins: [remarkMermaid, ...remarkPlugins],
     rehypePlugins,
     shikiConfig: { theme: shikiTheme },
   },

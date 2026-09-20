@@ -5,6 +5,8 @@ export interface SidebarItem {
   label: string;
   slug: string | null;
   items: SidebarItem[];
+  /** Doc frontmatter `tagline`, when present. Only used by the landing page cards. */
+  description?: string;
 }
 
 /**
@@ -38,6 +40,7 @@ export function buildSidebarTree(docs: CollectionEntry<'techDocs'>[]): SidebarIt
         label: (doc.data.title ?? doc.id).replace(/-/g, ' '),
         slug: doc.id,
         items: [],
+        description: doc.data.tagline,
       }))
       .sort((a, b) => a.label.localeCompare(b.label)),
   }));
