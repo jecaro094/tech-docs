@@ -63,7 +63,7 @@ for (const heading of headings) {
   tocItems={toc}
 >
   <Breadcrumbs crumbs={crumbs} />
-  <article class="doc">
+  <article class="doc doc-zoom">
     <a class="doc-back animate" style="animation-delay: 0.1s" href={withBase()}>← All docs</a>
     <div class="animate" style="animation-delay: 0.15s">
       <Content />
@@ -93,4 +93,88 @@ for (const heading of headings) {
       }, 2000);
     });
   });
+
+  // Image lightbox — only wire if there are zoomable images
+  {
+    const images = Array.from(document.querySelectorAll<HTMLImageElement>('.doc-zoom img'));
+    if (images.length > 0) {
+      const overlay = document.createElement('div');
+      overlay.className = 'doc-lightbox';
+      overlay.innerHTML = `
+        <button class="doc-lightbox-close" aria-label="Close">&times;</button>
+        <button class="doc-lightbox-arrow doc-lightbox-prev" aria-label="Previous">&lsaquo;</button>
+        <button class="doc-lightbox-arrow doc-lightbox-next" aria-label="Next">&rsaquo;</button>
+        <span class="doc-lightbox-counter"></span>
+        <span class="doc-lightbox-spinner"></span>
+        <img class="doc-lightbox-img" />
+      `;
+      document.body.appendChild(overlay);
+
+      const lbImg = overlay.querySelector<HTMLImageElement>('.doc-lightbox-img')!;
+      const closeBtn = overlay.querySelector<HTMLButtonElement>('.doc-lightbox-close')!;
+      const prevBtn = overlay.querySelector<HTMLButtonElement>('.doc-lightbox-prev')!;
+      const nextBtn = overlay.querySelector<HTMLButtonElement>('.doc-lightbox-next')!;
+      const counter = overlay.querySelector<HTMLSpanElement>('.doc-lightbox-counter')!;
+      const spinner = overlay.querySelector<HTMLSpanElement>('.doc-lightbox-spinner')!;
+
+      let currentIndex = 0;
+
+      function getImageSrc(img: HTMLImageElement): string {
+        const link = img.closest<HTMLAnchorElement>('a');
+        return link?.href ?? img.src;
+      }
+
+      function showImage(index: number) {
+        currentIndex = index;
+        const src = getImageSrc(images[index]);
+        spinner.classList.add('loading');
+        lbImg.style.opacity = '0';
+        lbImg.src = src;
+        lbImg.onload = () => {
+          spinner.classList.remove('loading');
+          lbImg.style.opacity = '1';
+        };
+        counter.textContent = images.length > 1 ? `${index + 1} / ${images.length}` : '';
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === images.length - 1;
+      }
+
+      function openLightbox(index: number) {
+        showImage(index);
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      function navigate(delta: number) {
+        const next = currentIndex + delta;
+        if (next >= 0 && next < images.length) showImage(next);
+      }
+
+      // Click on overlay background or close button
+      overlay.addEventListener('click', (e) => {
+        const target = e.target as Node;
+        if (target === overlay || target === closeBtn) closeLightbox();
+        if (target === prevBtn) navigate(-1);
+        if (target === nextBtn) navigate(1);
+      });
+
+      // Keyboard: Escape, ArrowLeft, ArrowRight
+      document.addEventListener('keydown', (e) => {
+        if (!overlay.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') navigate(-1);
+        if (e.key === 'ArrowRight') navigate(1);
+      });
+
+      // Wire click on each document image
+      images.forEach((img, i) => {
+        img.addEventListener('click', () => openLightbox(i));
+      });
+    }
+  }
 </script>
