@@ -3,6 +3,8 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": "jecaro094",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

@@ -94,3 +94,11 @@ from `public/docs/`, e.g. `![logo](/tech-docs/docs/thing.webp)`.
 
 No linter/formatter/test runner is configured; `npm run build` is the type gate.
 See `PLAN.md` for the design rationale and `CLAUDE.md` for the architecture.
+
+## License
+
+Copyright (c) jecaro094. The source code is licensed under the [MIT
+License](./LICENSE). The documentation content under `docs/` (and its images
+under `public/docs/`) is licensed separately under [CC BY
+4.0](./LICENSE-DOCS) — you're free to share and adapt it, but attribution to
+jecaro094 as the original author is required.
