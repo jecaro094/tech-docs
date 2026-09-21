@@ -39,7 +39,7 @@ const crumbs = [
   { label: 'Docs', href: withBase() },
   ...parts.map((part, i) => ({
     label: (allDocs.find((d) => d.id === parts.slice(0, i + 1).join('/'))?.data.title ?? part).replace(/-/g, ' '),
-    href: i < parts.length - 1 ? withBase(parts.slice(0, i + 1).join('/')) : undefined,
+    href: undefined,
   })),
 ];
 
