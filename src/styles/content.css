@@ -26,8 +26,8 @@
  * rest of the doc, instead of floating bare over the page background.
  */
 .mermaid {
-  display: flex;
-  justify-content: center;
+  display: block;
+  text-align: center;
   margin: 1.75rem 0;
   padding: 1.25rem 1rem;
   border-radius: 10px;
@@ -36,7 +36,49 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   overflow-x: auto;
 }
+/*
+ * No max-width/scaling here on purpose: Mermaid sizes the SVG to fit its
+ * content (labels, participants) at a legible font size. Capping it to the
+ * container width would rescale the whole diagram — text included — down to
+ * fit, which is what made wide sequence diagrams unreadable. Letting it keep
+ * its natural size and scroll horizontally when it overflows keeps the text
+ * legible instead.
+ */
 .mermaid svg {
-  max-width: 100%;
   height: auto;
+}
+
+/*
+ * Diagram zoom — same lightbox / hover treatment as .doc-zoom images
+ * (@jecaro/md-editor/styles/doc.css), wired up in [...slug].astro. Lets a
+ * diagram that's wider than the content column open full-screen instead of
+ * only being reachable via horizontal scroll — the main win is on mobile,
+ * where there's no room to render it legibly inline at all.
+ */
+.doc-zoom .mermaid {
+  cursor: zoom-in;
+  position: relative;
+}
+.doc-zoom .mermaid:hover {
+  border-color: var(--accent, #7bb8ff);
+  box-shadow: 0 4px 24px rgba(123, 184, 255, 0.25);
+}
+.doc-zoom .mermaid::after {
+  content: "";
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  background-color: rgba(0, 0, 0, 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.doc-zoom .mermaid:hover::after {
+  opacity: 1;
 }

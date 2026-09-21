@@ -4,6 +4,9 @@ node_modules/
 # Build output
 dist/
 
+# Private docs
+docs/private
+
 # Astro
 .astro/
 
