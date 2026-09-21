@@ -4,6 +4,7 @@ import { loadEnv } from 'vite';
 import node from '@astrojs/node';
 import { remarkPlugins, rehypePlugins, shikiTheme } from '@jecaro/md-editor/markdown';
 import { remarkMermaid } from './src/lib/remark-mermaid';
+import { rehypeGithubIcon } from './src/lib/rehype-github-icon';
 
 // Load DOCS_DIR from .env / .env.example and expose it on process.env so that
 // content.config.ts (which runs outside Vite's env handling) can read it.
@@ -34,7 +35,7 @@ export default defineConfig({
   // preview endpoint reuses the exact same transforms and theme.
   markdown: {
     remarkPlugins: [remarkMermaid, ...remarkPlugins],
-    rehypePlugins,
+    rehypePlugins: [...rehypePlugins, rehypeGithubIcon],
     shikiConfig: { theme: shikiTheme },
   },
   // A `npm link`ed @jecaro/md-editor resolves through node_modules as a

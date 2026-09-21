@@ -82,3 +82,37 @@
 .doc-zoom .mermaid:hover::after {
   opacity: 1;
 }
+
+/*
+ * GitHub link icon — any published-page link to github.com gets the mark
+ * prefixed inline, like a Jira smart link (src/lib/rehype-github-icon.ts).
+ * Sized in `em` so it scales with the surrounding text and sits on the
+ * baseline. The mark ships as an opaque black circle, so it's inverted to
+ * read on the dark theme's near-black background and left as-is on light.
+ *
+ * `@jecaro/md-editor`'s `.doc img` (prose images) sets `display: block`,
+ * `max-width: 100%`, `height: auto` and a 2rem margin — higher specificity
+ * than a bare `.gh-link-icon` class (class+tag beats class alone), so it wins
+ * the cascade and blows the icon up to a full-width block. `.doc a img.…`
+ * out-specifies it and resets every one of those properties back to an
+ * inline glyph.
+ */
+.doc a img.gh-link-icon {
+  display: inline;
+  width: 1em;
+  height: 1em;
+  max-width: none;
+  margin: 0 0.3em 0 0;
+  border: none;
+  vertical-align: -0.15em;
+  filter: invert(1) brightness(1.15);
+}
+
+[data-theme="light"] .doc a img.gh-link-icon {
+  filter: none;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .doc a img.gh-link-icon {
+    filter: none;
+  }
+}
