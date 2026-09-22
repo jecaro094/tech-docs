@@ -14,11 +14,15 @@ import fs from 'node:fs/promises';
 import { resolveDocPath, DocPathError } from '../../lib/docs';
 import { renderMarkdown, splitFrontmatter } from '@jecaro/md-editor/markdown';
 import { EDITOR_ENABLED } from '../../lib/editor-enabled';
+import { preprocessMermaidFences } from '../../lib/mermaid-preprocess';
 import { withBase } from '../../lib/url';
 import '../../styles/global.css';
 import '@jecaro/md-editor/styles/editor.css';
 import '@jecaro/md-editor/styles/doc.css';
 import '@jecaro/md-editor/styles/inline.css';
+// For the `.mermaid` theme-toggle rules (see content.css) — the preview
+// pane wraps rendered blocks in the same `.doc` class as the published page.
+import '../../styles/content.css';
 
 if (!EDITOR_ENABLED) {
   return new Response('The editor is only available under `astro dev`.', {
@@ -34,7 +38,8 @@ let loadError: string | null = null;
 
 try {
   raw = await fs.readFile(resolveDocPath(slug), 'utf8');
-  initialHtml = await renderMarkdown(splitFrontmatter(raw).body);
+  const body = await preprocessMermaidFences(splitFrontmatter(raw).body);
+  initialHtml = await renderMarkdown(body);
 } catch (err) {
   if (err instanceof DocPathError) {
     loadError = err.message;

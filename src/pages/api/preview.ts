@@ -17,6 +17,7 @@ import type { APIRoute } from 'astro';
 import yaml from 'js-yaml';
 import { renderMarkdown, splitFrontmatter } from '@jecaro/md-editor/markdown';
 import { EDITOR_ENABLED } from '../../lib/editor-enabled';
+import { preprocessMermaidFences } from '../../lib/mermaid-preprocess';
 
 export const prerender = false;
 
@@ -44,7 +45,9 @@ export const POST: APIRoute = async ({ request }) => {
     }
     try {
       const htmls = await Promise.all(
-        (payload.blocks as string[]).map((block) => renderMarkdown(block)),
+        (payload.blocks as string[]).map(async (block) =>
+          renderMarkdown(await preprocessMermaidFences(block)),
+        ),
       );
       return json({ htmls });
     } catch (err) {
@@ -70,7 +73,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    const html = await renderMarkdown(body);
+    const html = await renderMarkdown(await preprocessMermaidFences(body));
     return json({ html });
   } catch (err) {
     return json({ error: `Render failed: ${(err as Error).message}` }, 500);

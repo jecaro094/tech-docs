@@ -37,15 +37,55 @@
   overflow-x: auto;
 }
 /*
- * No max-width/scaling here on purpose: Mermaid sizes the SVG to fit its
+ * No max-width/scaling here on purpose: Mermaid sizes the diagram to fit its
  * content (labels, participants) at a legible font size. Capping it to the
  * container width would rescale the whole diagram — text included — down to
  * fit, which is what made wide sequence diagrams unreadable. Letting it keep
  * its natural size and scroll horizontally when it overflows keeps the text
  * legible instead.
  */
-.mermaid svg {
+/*
+ * `@jecaro/md-editor/styles/doc.css`'s `.doc img` rule (margin, border,
+ * shadow, `display: block`) is meant for prose images, not a diagram that
+ * already sits in the `.mermaid` card above — it would otherwise nest a
+ * second bordered/shadowed box around the image and, at equal-or-higher
+ * specificity than a bare `.mermaid-img-light` toggle below, permanently
+ * win the `display` property so both theme variants stayed visible at once.
+ * Reset it here at matching specificity (`.doc img` = 0,1,1).
+ */
+.doc .mermaid img {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   height: auto;
+}
+
+/*
+ * Diagrams are pre-rendered to two static images (light/dark, see
+ * src/lib/mermaid-render.ts) and both ship in the DOM; only the one matching
+ * the current site theme is shown. Mirrors the three-way toggle used for
+ * `.expressive-code` in global.css (explicit dark default, explicit light
+ * override, OS-preference light with no explicit override). Specificity is
+ * bumped to `.mermaid .mermaid-img-*` (0,2,0) so it reliably beats `.doc
+ * img`'s `display: block` (0,1,1) above.
+ */
+.mermaid .mermaid-img-light {
+  display: none;
+}
+[data-theme="light"] .mermaid .mermaid-img-dark {
+  display: none;
+}
+[data-theme="light"] .mermaid .mermaid-img-light {
+  display: block;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .mermaid .mermaid-img-dark {
+    display: none;
+  }
+  :root:not([data-theme]) .mermaid .mermaid-img-light {
+    display: block;
+  }
 }
 
 /*
@@ -58,6 +98,7 @@
 .doc-zoom .mermaid {
   cursor: zoom-in;
   position: relative;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 .doc-zoom .mermaid:hover {
   border-color: var(--accent, #7bb8ff);

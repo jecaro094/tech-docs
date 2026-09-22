@@ -94,80 +94,20 @@ for (const heading of headings) {
     });
   });
 
-  // Mermaid diagrams — client-side rendering, themed from the site's own
-  // CSS custom properties (see src/lib/mermaid-theme.ts) instead of
-  // Mermaid's generic built-in 'dark'/'default' themes, so diagrams match
-  // the page's palette in both light and dark mode.
+  // Media lightbox — doc images and Mermaid diagrams (now pre-rendered
+  // server-side to static <img> data URIs, see src/lib/mermaid-render.ts —
+  // both the dark and light variant are in the DOM at all times, toggled by
+  // CSS on the site theme, so the selector below excludes whichever one is
+  // currently hidden).
   {
-    const initialContainers = document.querySelectorAll<HTMLElement>('.mermaid');
-    if (initialContainers.length > 0) {
-      const [mermaid, { buildMermaidThemeVariables }] = await Promise.all([
-        import('mermaid').then((m) => m.default),
-        import('../lib/mermaid-theme'),
-      ]);
+    const ZOOMABLE_SELECTOR = '.doc-zoom img';
 
-      // Store original definitions on first load
-      const definitions = new Map<HTMLElement, string>();
-      initialContainers.forEach((div) => {
-        definitions.set(div, div.textContent ?? '');
-      });
-
-      let renderId = 0;
-
-      async function renderDiagrams() {
-        renderId++;
-
-        // Re-query current .mermaid nodes each time (may have been replaced)
-        const current = document.querySelectorAll<HTMLElement>('.mermaid');
-
-        // Replace each container with a fresh div (avoids stale SVG/ID conflicts)
-        current.forEach((oldDiv) => {
-          const def = definitions.get(oldDiv) ?? oldDiv.textContent ?? '';
-          const fresh = document.createElement('div');
-          fresh.className = 'mermaid';
-          fresh.textContent = def;
-          oldDiv.replaceWith(fresh);
-          // Track the new node with the same definition
-          definitions.set(fresh, def);
-        });
-
-        // Re-query the fresh nodes
-        const freshNodes = document.querySelectorAll<HTMLElement>('.mermaid');
-
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'base',
-          themeVariables: buildMermaidThemeVariables(),
-          securityLevel: 'loose',
-          generateId: true,
-          mermaid: { id: `mermaid-${renderId}` },
-          // Mermaid's default `useMaxWidth: true` (kept for every diagram
-          // type, including sequence) shrinks the SVG to the content column
-          // like a flowchart, instead of overflowing at natural size. A
-          // shrunk diagram that's too small to read stays legible via the
-          // click-to-enlarge lightbox below (ZOOMABLE_SELECTOR), which shows
-          // the same SVG at full detail.
-        });
-
-        await mermaid.run({ nodes: freshNodes });
-      }
-
-      await renderDiagrams();
-
-      // Re-render on theme change
-      document.addEventListener('themechange', () => renderDiagrams());
+    function isVisible(el: HTMLElement): boolean {
+      return el.offsetParent !== null;
     }
-  }
-
-  // Media lightbox — doc images and Mermaid diagrams, in reading order.
-  // Diagrams are queried fresh on each open rather than collected once,
-  // because a theme change replaces their DOM nodes entirely (see the
-  // Mermaid block above); collecting eagerly would leave stale references.
-  {
-    const ZOOMABLE_SELECTOR = '.doc-zoom img, .doc-zoom .mermaid';
 
     function hasZoomables(): boolean {
-      return document.querySelector(ZOOMABLE_SELECTOR) !== null;
+      return Array.from(document.querySelectorAll<HTMLElement>(ZOOMABLE_SELECTOR)).some(isVisible);
     }
 
     if (hasZoomables()) {
@@ -192,21 +132,8 @@ for (const heading of headings) {
 
       let zoomables: HTMLElement[] = [];
       let currentIndex = 0;
-      let currentBlobUrl: string | null = null;
 
-      // A Mermaid diagram is serialized from its live (already themed) SVG
-      // into a Blob URL, so the lightbox can treat it exactly like an <img>
-      // src. Revoked on the next navigation/close to avoid leaking blobs.
       function getSrc(el: HTMLElement): string {
-        if (el.classList.contains('mermaid')) {
-          const svg = el.querySelector('svg');
-          if (!svg) return '';
-          if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-          const markup = new XMLSerializer().serializeToString(svg);
-          const blob = new Blob([markup], { type: 'image/svg+xml' });
-          currentBlobUrl = URL.createObjectURL(blob);
-          return currentBlobUrl;
-        }
         const img = el as HTMLImageElement;
         const link = img.closest<HTMLAnchorElement>('a');
         return link?.href ?? img.src;
@@ -228,7 +155,9 @@ for (const heading of headings) {
       }
 
       function openLightbox(el: HTMLElement) {
-        zoomables = Array.from(document.querySelectorAll<HTMLElement>(ZOOMABLE_SELECTOR));
+        zoomables = Array.from(document.querySelectorAll<HTMLElement>(ZOOMABLE_SELECTOR)).filter(
+          isVisible,
+        );
         const index = zoomables.indexOf(el);
         showImage(index === -1 ? 0 : index);
         overlay.classList.add('active');
@@ -261,8 +190,6 @@ for (const heading of headings) {
         if (e.key === 'ArrowRight') navigate(1);
       });
 
-      // Delegated click: survives Mermaid re-rendering its containers'
-      // children on theme change (the .mermaid div itself is stable).
       document.addEventListener('click', (e) => {
         const target = (e.target as HTMLElement).closest<HTMLElement>(ZOOMABLE_SELECTOR);
         if (target) openLightbox(target);

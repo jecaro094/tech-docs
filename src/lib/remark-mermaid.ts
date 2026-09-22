@@ -1,31 +1,29 @@
 import { visit } from 'unist-util-visit';
 import type { Root, Code, Html } from 'mdast';
+import { renderMermaidBlock } from './mermaid-render';
 
 /**
- * Remark plugin: transform ```mermaid code fences into <div class="mermaid">
- * elements so that Mermaid client-side can render them on page load.
+ * Remark plugin: replace ```mermaid code fences with a pre-rendered
+ * `<div class="mermaid">` of static `<img>` data URIs (see
+ * `mermaid-render.ts`) — diagrams are always images, rendered once at build
+ * time, identical across every viewer instead of re-drawn client-side.
  *
  * Must run BEFORE remarkStashCodeLangs to avoid polluting the code-language
  * queue with mermaid entries that Shiki would try to highlight.
  */
 export function remarkMermaid() {
-  return (tree: Root) => {
+  return async (tree: Root) => {
+    const nodes: { node: Code; index: number; parent: Root }[] = [];
     visit(tree, 'code', (node: Code, index, parent) => {
       if (node.lang !== 'mermaid' || !parent || typeof index !== 'number') return;
-
-      const htmlNode: Html = {
-        type: 'html',
-        value: `<div class="mermaid">${escapeHtml(node.value)}</div>`,
-      };
-
-      parent.children.splice(index, 1, htmlNode);
+      nodes.push({ node, index, parent: parent as Root });
     });
-  };
-}
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    // Render in document order but replace back-to-front so earlier indices
+    // in `parent.children` stay valid as later splices happen.
+    for (const { node, index, parent } of [...nodes].reverse()) {
+      const html: Html = { type: 'html', value: await renderMermaidBlock(node.value) };
+      parent.children.splice(index, 1, html);
+    }
+  };
 }
