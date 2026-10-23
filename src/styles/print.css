@@ -31,7 +31,9 @@
   .doc-back,
   .print-btn,
   .breadcrumbs,
-  #sidebar-toggle {
+  #sidebar-toggle,
+  #sidebar-restore,
+  .sidebar-collapse {
     display: none !important;
   }
 

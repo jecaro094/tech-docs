@@ -9,21 +9,97 @@
   height: calc(100vh - 53px);
   position: sticky;
   top: 53px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
   border-right: 1px solid var(--border);
   background: var(--bg);
+}
+
+.sidebar-scroll {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 2rem 0;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
 
-.sidebar::-webkit-scrollbar {
+.sidebar-scroll::-webkit-scrollbar {
   width: 5px;
 }
-.sidebar::-webkit-scrollbar-thumb {
+.sidebar-scroll::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
+}
+
+/* --- Desktop collapse ---
+ * Collapsing animates the column's width to 0 (instead of display:none) so the
+ * doc content expands progressively in the same frame the sidebar shrinks.
+ * `visibility` is deferred by the animation duration on collapse so links stay
+ * visible while sliding but leave the tab order the moment the column is gone;
+ * on expand it flips back instantly. The border shrinks with the width to avoid
+ * a stranded 1px line, and the chevron rides the edge and fades out with it.
+ */
+.sidebar-collapse {
+  position: absolute;
+  top: 1.4rem;
+  right: -12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-raised);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, opacity 0.25s ease;
+}
+
+.sidebar-collapse:hover {
+  color: var(--fg);
+  border-color: var(--muted);
+}
+
+.sidebar-collapse:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (min-width: 1025px) {
+  .sidebar {
+    transition:
+      width 0.25s ease,
+      min-width 0.25s ease,
+      border-right-width 0.25s ease,
+      visibility 0s;
+  }
+
+  html.sidebar-collapsed .sidebar {
+    width: 0;
+    min-width: 0;
+    border-right-width: 0;
+    visibility: hidden;
+    transition:
+      width 0.25s ease,
+      min-width 0.25s ease,
+      border-right-width 0.25s ease,
+      visibility 0s 0.25s;
+  }
+
+  html.sidebar-collapsed .sidebar-collapse {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  html.sidebar-collapsed .sidebar {
+    transition: none;
+  }
 }
 
 .sidebar-root {
@@ -119,5 +195,9 @@
   .sidebar.is-open {
     transform: translateX(0);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  }
+  /* Collapse-to-rail is a desktop affordance; mobile keeps the header drawer */
+  .sidebar-collapse {
+    display: none;
   }
 }
