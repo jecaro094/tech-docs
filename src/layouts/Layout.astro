@@ -72,6 +72,9 @@ const hasSidebar = Boolean(sidebarTree && sidebarTree.length > 0);
       (function() {
         var t = localStorage.getItem('theme-preference') || 'dark';
         if (t !== 'auto') document.documentElement.setAttribute('data-theme', t);
+        var os = localStorage.getItem('os-preference');
+        if (!os) os = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? 'mac' : 'ubuntu';
+        document.documentElement.setAttribute('data-os', os);
         if (localStorage.getItem('sidebar-collapsed') === '1') {
           document.documentElement.classList.add('sidebar-collapsed');
         }

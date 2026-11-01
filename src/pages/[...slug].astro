@@ -73,6 +73,46 @@ for (const heading of headings) {
 </Layout>
 
 <script>
+  // OS switch — fill every `::os-toggle` (src/lib/remark-os-blocks.ts) with its
+  // buttons. The choice lives on <html data-os> (set before paint by
+  // Layout.astro) and is remembered in localStorage.
+  document.querySelectorAll<HTMLElement>('.os-toggle').forEach((toggle) => {
+    const options = [
+      { os: 'mac', label: '🍎 macOS' },
+      { os: 'ubuntu', label: '🐧 Ubuntu' },
+    ];
+    toggle.replaceChildren(
+      ...options.map(({ os, label }) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.os = os;
+        btn.textContent = label;
+        return btn;
+      }),
+    );
+  });
+
+  function syncOsToggles() {
+    const current = document.documentElement.dataset.os;
+    document.querySelectorAll<HTMLButtonElement>('.os-toggle button').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.os === current));
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.os-toggle button');
+    if (!btn?.dataset.os) return;
+    document.documentElement.dataset.os = btn.dataset.os;
+    try {
+      localStorage.setItem('os-preference', btn.dataset.os);
+    } catch {}
+    syncOsToggles();
+  });
+
+  syncOsToggles();
+</script>
+
+<script>
   // Wire the copy button that rehypeCodeFrame adds around every <pre>.
   document.querySelectorAll<HTMLElement>('.expressive-code').forEach((frame) => {
     const btn = frame.querySelector<HTMLButtonElement>('.copy-btn');
