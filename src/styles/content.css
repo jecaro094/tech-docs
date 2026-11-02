@@ -159,8 +159,8 @@
 }
 
 /*
- * OS switch — `::os-toggle`, `:::mac` and `:::ubuntu` (src/lib/remark-os-blocks.ts).
- * `<html data-os>` is set before paint by Layout.astro and flipped by the
+ * OS switch — `:::mac` and `:::ubuntu` (src/lib/remark-os-blocks.ts).
+ * `<html data-os>` is set before paint by Layout.astro and flipped by the tabs the
  * script in [...slug].astro. With no `data-os` (no JS) every block stays visible.
  */
 html[data-os="mac"] .os-block[data-os="ubuntu"],
@@ -168,30 +168,26 @@ html[data-os="ubuntu"] .os-block[data-os="mac"] {
   display: none;
 }
 
-.os-toggle {
-  display: inline-flex;
+.code-lang.os-tabs {
+  display: flex;
   gap: 0.25rem;
-  margin: 0.5rem 0 1.25rem;
-  padding: 0.25rem;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-raised);
+  text-transform: none;
 }
-.os-toggle button {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  padding: 0.4rem 0.9rem;
+.os-tabs button {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
   border: 0;
-  border-radius: 7px;
+  border-radius: 6px;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
-.os-toggle button:hover {
-  color: var(--accent);
+.os-tabs button:hover {
+  color: var(--fg);
 }
-.os-toggle button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
-  color: var(--accent);
+.os-tabs button[aria-selected="true"] {
+  background: color-mix(in srgb, var(--fg) 10%, transparent);
+  color: var(--fg);
 }

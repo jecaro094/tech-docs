@@ -73,18 +73,23 @@ for (const heading of headings) {
 </Layout>
 
 <script>
-  // OS switch — fill every `::os-toggle` (src/lib/remark-os-blocks.ts) with its
-  // buttons. The choice lives on <html data-os> (set before paint by
-  // Layout.astro) and is remembered in localStorage.
-  document.querySelectorAll<HTMLElement>('.os-toggle').forEach((toggle) => {
-    const options = [
-      { os: 'mac', label: '🍎 macOS' },
-      { os: 'ubuntu', label: '🐧 Ubuntu' },
-    ];
-    toggle.replaceChildren(
-      ...options.map(({ os, label }) => {
+  // OS switch — turn the title bar of every code frame inside a `:::mac` /
+  // `:::ubuntu` block (src/lib/remark-os-blocks.ts) into macOS / Ubuntu tabs.
+  // The choice lives on <html data-os> (set before paint by Layout.astro), is
+  // shared by every block on the page and remembered in localStorage.
+  const OS_OPTIONS = [
+    { os: 'mac', label: 'macOS' },
+    { os: 'ubuntu', label: 'Ubuntu' },
+  ];
+
+  document.querySelectorAll<HTMLElement>('.os-block .expressive-code .code-lang').forEach((lang) => {
+    lang.classList.add('os-tabs');
+    lang.setAttribute('role', 'tablist');
+    lang.replaceChildren(
+      ...OS_OPTIONS.map(({ os, label }) => {
         const btn = document.createElement('button');
         btn.type = 'button';
+        btn.role = 'tab';
         btn.dataset.os = os;
         btn.textContent = label;
         return btn;
@@ -92,24 +97,24 @@ for (const heading of headings) {
     );
   });
 
-  function syncOsToggles() {
+  function syncOsTabs() {
     const current = document.documentElement.dataset.os;
-    document.querySelectorAll<HTMLButtonElement>('.os-toggle button').forEach((btn) => {
-      btn.setAttribute('aria-pressed', String(btn.dataset.os === current));
+    document.querySelectorAll<HTMLButtonElement>('.os-tabs button').forEach((btn) => {
+      btn.setAttribute('aria-selected', String(btn.dataset.os === current));
     });
   }
 
   document.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.os-toggle button');
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.os-tabs button');
     if (!btn?.dataset.os) return;
     document.documentElement.dataset.os = btn.dataset.os;
     try {
       localStorage.setItem('os-preference', btn.dataset.os);
     } catch {}
-    syncOsToggles();
+    syncOsTabs();
   });
 
-  syncOsToggles();
+  syncOsTabs();
 </script>
 
 <script>

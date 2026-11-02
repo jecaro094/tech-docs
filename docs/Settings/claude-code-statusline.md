@@ -13,6 +13,10 @@ A single line that Claude Code renders under the prompt and refreshes every few 
 🤖 Sonnet 5.5  │  📁 tech-docs  │  🌿 main  │  🧠 4% ░░░░░░░░░░  │  💰 $0.06  │  ⚡ CPU 35%  │  RAM 12.2/24.0 GB (51%)
 ```
 
+This is how it looks in a real Claude Code session, right under the prompt:
+
+![Claude Code with the custom status line under the prompt](/tech-docs/docs/claude-statusline.png)
+
 | Segment | Source | Colour rule |
 |---|---|---|
 | 🤖 Model | `model.display_name` from the JSON Claude Code sends | — |
@@ -23,9 +27,7 @@ A single line that Claude Code renders under the prompt and refreshes every few 
 | ⚡ CPU | system user + sys load | — |
 | RAM | used / total GB | green &lt; 75 %, yellow ≥ 75 %, red ≥ 90 % |
 
-The first four segments come from Claude Code itself; **CPU and RAM are the only OS-specific parts**. Pick your system below — the whole page switches.
-
-::os-toggle
+The first four segments come from Claude Code itself; **CPU and RAM are the only OS-specific parts**. Use the **macOS / Ubuntu** tabs on any code block below — the whole page switches.
 
 ## 2. How it works
 
