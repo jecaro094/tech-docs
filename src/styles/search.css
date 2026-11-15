@@ -105,6 +105,10 @@
   font-size: 0.85rem;
   line-height: 1.5;
   color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .search-results mark {
   background: color-mix(in srgb, var(--accent) 28%, transparent);
