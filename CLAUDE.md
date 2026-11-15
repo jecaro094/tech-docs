@@ -164,6 +164,18 @@ security boundary:
   `styles/inline.css` — inline-mode syntax marks and block widgets. The last two
   are imported only by `edit.astro`.
 
+## Design layer (search, sections, doc meta)
+
+- **Search**: `npm run build` runs `pagefind --site dist/client` after Astro, indexing only
+  `[data-pagefind-body]` (the doc `<article>`). `SearchModal.astro` lazy-loads
+  `/tech-docs/pagefind/pagefind.js`; it does **not** work under `astro dev` (no index) — use
+  `npm run build && npm run preview`. Shortcuts: `/` and `⌘K`/`Ctrl K`.
+- **Sections**: `src/lib/sections.ts` maps top-level folder → colour + icon (edit there).
+- **Doc meta**: `src/lib/doc-meta.ts` — "Updated" date from `git log` (mtime fallback for
+  untracked docs) and reading time. CI checkouts use `fetch-depth: 0` so dates are real.
+- **Tags**: optional `tags: [a, b]` frontmatter renders chips on the landing and filters it.
+- `src/styles/design.css` is the last-loaded refinement layer over the package's `.doc` prose.
+
 ## Doc images
 
 Referenced by absolute URL, **including the `/tech-docs` base**, and served from

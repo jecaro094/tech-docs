@@ -1,0 +1,244 @@
+/*
+ * Design refresh layer — loaded last (Layout.astro) so it can refine the
+ * package's `.doc` prose and the earlier site stylesheets without touching them.
+ * Sections: reading comfort · doc meta row · heading anchors · mobile TOC ·
+ * tables/admonitions · landing (recent, cards, tags) · sidebar sections ·
+ * accessibility & motion.
+ */
+
+/* === Reading comfort ============================================== */
+/* Cap the measure (~85-95 chars) and centre it; the column used to stretch
+   edge to edge when the sidebar was collapsed. */
+.doc-content .doc {
+  max-width: 50rem;
+  margin-inline: auto;
+}
+.doc-content .doc p,
+.doc-content .doc li {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.doc :is(h1, h2, h3, h4) { text-wrap: balance; }
+.doc p, .doc li { text-wrap: pretty; }
+.doc-content .doc h2 { margin-top: 3rem; }
+
+body {
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+.site-header, .sidebar, .feature-card, .prev-next-link {
+  transition-property: background-color, border-color, color, transform, box-shadow;
+  transition-duration: 0.25s;
+}
+
+/* === Doc meta row ================================================== */
+.doc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1.1rem;
+  margin: -0.25rem 0 1.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.doc-meta-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--section, var(--accent)) 40%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--section, var(--accent)) 10%, transparent);
+  color: var(--fg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.doc-meta-item { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+/* === Heading anchors ============================================== */
+.doc :is(h2, h3, h4) { position: relative; }
+.heading-anchor {
+  position: absolute;
+  left: -1.35em;
+  top: 0;
+  width: 1.2em;
+  text-align: center;
+  color: var(--muted) !important;
+  text-decoration: none !important;
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.doc :is(h2, h3, h4):hover > .heading-anchor,
+.heading-anchor:focus-visible { opacity: 1; }
+.heading-anchor:hover { color: var(--accent) !important; }
+.heading-anchor.copied { color: #34d399 !important; opacity: 1; }
+@media (hover: none) { .heading-anchor { display: none; } }
+
+/* === Mobile TOC (right TOC is hidden under 1280px) ================= */
+.mobile-toc {
+  display: none;
+  margin: 0 0 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  font-size: 0.9rem;
+}
+.mobile-toc summary {
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mobile-toc ul { list-style: none; margin: 0; padding: 0 1rem 0.75rem; }
+.mobile-toc ul ul { padding: 0 0 0 1rem; }
+.mobile-toc a { display: block; padding: 0.25rem 0; color: var(--fg); text-decoration: none; }
+.mobile-toc a:hover { color: var(--accent); }
+@media (max-width: 1280px) { .mobile-toc { display: block; } }
+
+/* === Tables & admonitions ========================================== */
+/* The package zebra/hover use white-on-dark rgba, invisible on the light theme. */
+.doc tr:nth-child(even) td { background: color-mix(in srgb, var(--fg) 3%, transparent); }
+.doc tr:hover td { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.doc .table-scroll {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.doc .table-scroll table { border: 0; }
+.doc .table-scroll :is(th, td) { border-inline: 0; }
+.doc .table-scroll tr:last-child td { border-bottom: 0; }
+.doc th { position: sticky; top: 0; }
+.doc .admonition { box-shadow: 0 2px 12px color-mix(in srgb, var(--adm-accent) 8%, transparent); }
+
+/* === Landing ======================================================= */
+.hero { padding: 3.25rem 1rem 2rem; }
+.hero h1 { font-size: 2.6rem; }
+
+.recent { margin-bottom: 2.5rem; }
+.recent-title, .doc-group-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.doc-group-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.8;
+}
+.feature-card {
+  --section: var(--accent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--section);
+  opacity: 0.75;
+}
+.feature-card:hover {
+  border-color: color-mix(in srgb, var(--section) 55%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--section) 14%, transparent);
+}
+.feature-card p { flex: 1; }
+.card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.card-section { text-transform: capitalize; display: inline-flex; align-items: center; gap: 0.35rem; }
+
+.tag-filter { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: -0.75rem auto 2rem; max-width: 640px; }
+.tag-chip {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.tag-chip:hover { color: var(--fg); border-color: var(--muted); }
+.tag-chip[aria-pressed="true"] {
+  color: var(--fg);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.card-tag {
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+/* The base gradient darkens towards black — muddy on a white page. */
+[data-theme="light"] :is(.feature-card, .search-input) {
+  background: var(--bg-raised);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) :is(.feature-card, .search-input) { background: var(--bg-raised); }
+}
+
+/* === Sidebar sections ============================================== */
+.sidebar-group-toggle .section-icon { flex-shrink: 0; }
+.sidebar-group.is-active > .sidebar-group-toggle { color: var(--fg); }
+.sidebar-group.is-active .sidebar-items li.is-active a {
+  border-left-color: var(--section, var(--accent));
+}
+
+/* === Accessibility & motion ======================================== */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  transition: top 0.15s ease;
+}
+.skip-link:focus { top: 0.75rem; text-decoration: none; }
+
+:where(a, button, summary, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+#main-content:focus { outline: none; }
+
+/* Cross-document view transitions (Chromium; ignored elsewhere): soft fade
+   between pages while the header and sidebar stay put. */
+@view-transition { navigation: auto; }
+.site-header { view-transition-name: site-header; }
+.sidebar { view-transition-name: site-sidebar; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.18s; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; }
+  @view-transition { navigation: none; }
+}

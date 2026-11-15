@@ -1,5 +1,6 @@
 import { relative, resolve } from 'node:path';
 import type { CollectionEntry } from 'astro:content';
+import { lastModified, readingMinutes } from './doc-meta';
 
 export interface SidebarItem {
   label: string;
@@ -7,6 +8,12 @@ export interface SidebarItem {
   items: SidebarItem[];
   /** Doc frontmatter `tagline`, when present. Only used by the landing page cards. */
   description?: string;
+  /** ISO date of the last edit (git, else mtime). */
+  updated?: string;
+  /** Estimated reading time in minutes. */
+  minutes?: number;
+  /** Frontmatter `tags`, normalised to a string array. */
+  tags?: string[];
 }
 
 /**
@@ -41,6 +48,9 @@ export function buildSidebarTree(docs: CollectionEntry<'techDocs'>[]): SidebarIt
         slug: doc.id,
         items: [],
         description: doc.data.tagline,
+        updated: lastModified(doc.filePath),
+        minutes: readingMinutes(doc.body),
+        tags: normaliseTags(doc.data.tags),
       }))
       .sort((a, b) => a.label.localeCompare(b.label)),
   }));
@@ -57,4 +67,10 @@ export function flattenSlugs(tree: SidebarItem[]): string[] {
     }
   }
   return slugs;
+}
+
+function normaliseTags(raw: unknown): string[] {
+  if (Array.isArray(raw)) return raw.map(String).filter(Boolean);
+  if (typeof raw === 'string') return raw.split(',').map((t) => t.trim()).filter(Boolean);
+  return [];
 }
