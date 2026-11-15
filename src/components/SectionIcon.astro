@@ -1,0 +1,25 @@
+---
+import { getSection } from '../lib/sections';
+
+interface Props {
+  name: string;
+  size?: number;
+}
+const { name, size = 16 } = Astro.props;
+const section = getSection(name);
+---
+
+<svg
+  class="section-icon"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  style={`color:${section.color}`}
+  set:html={section.icon}
+/>

@@ -7,7 +7,7 @@
   "author": "jecaro094",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist/client",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -19,5 +19,8 @@
     "js-yaml": "^4.3.2",
     "mermaid": "^12.0.0",
     "puppeteer": "^24.0.0"
+  },
+  "devDependencies": {
+    "pagefind": "^1.6.0"
   }
 }

@@ -5,6 +5,9 @@ import { withBase } from '../lib/url';
 import { buildSidebarTree, flattenSlugs } from '../lib/sidebar';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import PrevNext from '../components/PrevNext.astro';
+import SectionIcon from '../components/SectionIcon.astro';
+import { getSection } from '../lib/sections';
+import { formatDate, lastModified, readingMinutes } from '../lib/doc-meta';
 
 export async function getStaticPaths() {
   const docs = await getCollection('techDocs');
@@ -32,6 +35,12 @@ const prev = currentIndex > 0
 const next = currentIndex < flatSlugs.length - 1
   ? { slug: flatSlugs[currentIndex + 1], label: allDocs.find((d) => d.id === flatSlugs[currentIndex + 1])?.data.title ?? flatSlugs[currentIndex + 1] }
   : null;
+
+// Meta row: section, last edit, reading time
+const section = doc.id.includes('/') ? doc.id.split('/')[0] : 'General';
+const sectionColor = getSection(section).color;
+const updated = formatDate(lastModified(doc.filePath));
+const minutes = readingMinutes(doc.body);
 
 // Breadcrumbs
 const parts = doc.id.split('/');
@@ -63,8 +72,34 @@ for (const heading of headings) {
   tocItems={toc}
 >
   <Breadcrumbs crumbs={crumbs} />
-  <article class="doc doc-zoom">
-    <a class="doc-back animate" style="animation-delay: 0.1s" href={withBase()}>← All docs</a>
+  <article
+    class="doc doc-zoom"
+    style={`--section:${sectionColor}`}
+    data-pagefind-body
+    data-pagefind-meta="section[data-section]"
+    data-section={section}
+  >
+    <a class="doc-back animate" style="animation-delay: 0.1s" href={withBase()} data-pagefind-ignore>← All docs</a>
+    <div class="doc-meta animate" style="animation-delay: 0.12s" data-pagefind-ignore>
+      <span class="doc-meta-section"><SectionIcon name={section} size={13} />{section}</span>
+      {updated && <span class="doc-meta-item">Updated {updated}</span>}
+      <span class="doc-meta-item">{minutes} min read</span>
+    </div>
+    {toc.length > 0 && (
+      <details class="mobile-toc" data-pagefind-ignore>
+        <summary>On this page</summary>
+        <ul>
+          {toc.map((item) => (
+            <li>
+              <a href={`#${item.slug}`}>{item.text}</a>
+              {item.children.length > 0 && (
+                <ul>{item.children.map((c) => <li><a href={`#${c.slug}`}>{c.text}</a></li>)}</ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      </details>
+    )}
     <div class="animate" style="animation-delay: 0.15s">
       <Content />
     </div>
@@ -115,6 +150,25 @@ for (const heading of headings) {
   });
 
   syncOsTabs();
+</script>
+
+<script>
+  // Heading anchors — a "#" that appears on hover; clicking copies the deep link.
+  document.querySelectorAll<HTMLElement>('.doc :is(h2, h3, h4)[id]').forEach((h) => {
+    const a = document.createElement('a');
+    a.className = 'heading-anchor';
+    a.href = `#${h.id}`;
+    a.textContent = '#';
+    a.setAttribute('aria-label', `Link to “${h.textContent}”`);
+    a.addEventListener('click', () => {
+      const url = new URL(a.href, location.href).href;
+      navigator.clipboard?.writeText(url).then(() => {
+        a.classList.add('copied');
+        window.setTimeout(() => a.classList.remove('copied'), 1500);
+      }, () => {});
+    });
+    h.append(a);
+  });
 </script>
 
 <script>
