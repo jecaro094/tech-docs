@@ -242,3 +242,74 @@ body {
   * { transition-duration: 0.01ms !important; }
   @view-transition { navigation: none; }
 }
+
+/* =====================================================================
+ * Visual identity pass (palette lives in global.css tokens)
+ *  - accent reserved for interactive things; headings/bold use --fg
+ *  - sans-serif headings; mono kept for code, labels, dates and the logo
+ *  - one radius (10px), quieter borders and shadows
+ * ===================================================================== */
+:root { --radius: 10px; }
+
+/* Headings: Inter, heavy and tight, instead of JetBrains Mono */
+h1, h2, h3, h4, h5, h6,
+.doc :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.doc h1, .doc-content .doc h1 { font-weight: 800; letter-spacing: -0.03em; }
+.doc h2 {
+  color: var(--fg);
+  border-bottom: 1px solid var(--border);
+}
+.doc h3 { color: var(--fg); }
+.doc h4 { color: color-mix(in srgb, var(--fg) 82%, var(--muted)); }
+.doc h5, .doc h6 { font-family: var(--font-mono); letter-spacing: 0.03em; font-weight: 600; }
+.doc strong { color: var(--fg); font-weight: 600; }
+.doc li::marker { color: var(--muted); }
+
+/* Body copy */
+.doc-content .doc p,
+.doc-content .doc li {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+/* Inline code: neutral chip, not another blue */
+.doc :not(pre) > code {
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fg) 14%, transparent);
+  color: var(--fg);
+}
+
+/* Landing headings & labels */
+.hero h1 { font-weight: 800; letter-spacing: -0.035em; }
+.doc-group-title, .recent-title { font-family: var(--font-mono); font-weight: 600; letter-spacing: 0.06em; }
+.section h2 { font-family: var(--font-sans); }
+
+/* One radius everywhere */
+.feature-card,
+.prev-next-link,
+.doc img,
+.doc .mermaid,
+.doc .table-scroll,
+.doc .expressive-code,
+.expressive-code,
+.mobile-toc,
+.search-dialog { border-radius: var(--radius); }
+.doc .admonition { border-radius: 0 var(--radius) var(--radius) 0; box-shadow: none; }
+
+/* Quieter elevation: borders do the work, shadows only on hover */
+.doc img { box-shadow: none; }
+.doc .mermaid { box-shadow: none; }
+.doc-zoom img:hover { box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 20%, transparent); }
+
+/* Sidebar: soft tinted pill for the active page instead of a hard left bar */
+.sidebar-items li a { border-left-width: 0; border-radius: 8px; margin: 1px 0.6rem; padding-left: 1.4rem; padding-right: 0.75rem; }
+.sidebar-items li.is-active a,
+.sidebar-group.is-active .sidebar-items li.is-active a {
+  border-left-color: transparent;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--section, var(--accent)) 16%, transparent);
+}
