@@ -9,18 +9,18 @@
 /* === Reading comfort ============================================== */
 /* Cap the measure (~85-95 chars) and centre it; the column used to stretch
    edge to edge when the sidebar was collapsed. */
-.doc-content .doc {
+:root .doc-content .doc {
   max-width: 50rem;
   margin-inline: auto;
 }
-.doc-content .doc p,
-.doc-content .doc li {
+:root .doc-content .doc p,
+:root .doc-content .doc li {
   font-size: 1rem;
   line-height: 1.75;
 }
 .doc :is(h1, h2, h3, h4) { text-wrap: balance; }
 .doc p, .doc li { text-wrap: pretty; }
-.doc-content .doc h2 { margin-top: 3rem; }
+:root .doc-content .doc h2 { margin-top: 3rem; }
 
 body {
   -webkit-font-smoothing: antialiased;
@@ -105,8 +105,8 @@ body {
 
 /* === Tables & admonitions ========================================== */
 /* The package zebra/hover use white-on-dark rgba, invisible on the light theme. */
-.doc tr:nth-child(even) td { background: color-mix(in srgb, var(--fg) 3%, transparent); }
-.doc tr:hover td { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+:root .doc tr:nth-child(even) td { background: color-mix(in srgb, var(--fg) 3%, transparent); }
+:root .doc tr:hover td { background: color-mix(in srgb, var(--accent) 7%, transparent); }
 .doc .table-scroll {
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -119,8 +119,8 @@ body {
 .doc .admonition { box-shadow: 0 2px 12px color-mix(in srgb, var(--adm-accent) 8%, transparent); }
 
 /* === Landing ======================================================= */
-.hero { padding: 3.25rem 1rem 2rem; }
-.hero h1 { font-size: 2.6rem; }
+:root .hero { padding: 3.25rem 1rem 2rem; }
+:root .hero h1 { font-size: 2.6rem; }
 
 .recent { margin-bottom: 2.5rem; }
 .recent-title, .doc-group-title {
@@ -152,7 +152,7 @@ body {
   background: var(--section);
   opacity: 0.75;
 }
-.feature-card:hover {
+:root .feature-card:hover {
   border-color: color-mix(in srgb, var(--section) 55%, transparent);
   box-shadow: 0 8px 24px color-mix(in srgb, var(--section) 14%, transparent);
 }
